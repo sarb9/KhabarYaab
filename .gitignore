@@ -1,2 +1,5 @@
 env
 .vscode
+.idea
+Frontend/node_modules
+.Ds_store

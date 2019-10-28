@@ -1,0 +1,8 @@
+{
+  "short_name": "React App",
+  "name": "Khabar Yaab: A persian News Retrieval framework",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
