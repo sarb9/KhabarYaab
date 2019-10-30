@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import NewsFramework from "./NewsFramework";
+import NewsFramework from "./components/NewsFramework";
 import "./App.css";
-import SearchPage from "./SearchPage";
+import SearchPage from "./components/SearchPage";
+import Header from "./components/Header";
 
 export class App extends Component {
   state = {
@@ -23,6 +24,7 @@ export class App extends Component {
   render() {
     return (
       <div className="App">
+        <Header />
         <SearchPage />
         <NewsFramework NewsList={this.state.NewsList} />
       </div>
