@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import "./App.css";
 import SearchPage from "./components/SearchPage";
 import Header from "./components/Header";
+import About from "./components/About";
 
 export class App extends Component {
   render() {
@@ -13,6 +14,7 @@ export class App extends Component {
           <Header />
           <Route
             path="/"
+            exact
             render={props => (
               <React.Fragment>
                 <SearchPage />
@@ -20,6 +22,7 @@ export class App extends Component {
             )}
           />
           <Route path="/Results" render={props => <NewsFramework />} />
+          <Route path="/About" render={props => <About />} />
         </div>
       </Router>
     );

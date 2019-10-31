@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "./styles/SearchPage.css";
+import axios from "axios";
 
 export class SearchPage extends Component {
   state = {
@@ -8,6 +9,13 @@ export class SearchPage extends Component {
 
   onSubmit = e => {
     e.preventDefault();
+    axios
+      .post("https://jsonplaceholder.typicode.com/todos", {
+        id: 1,
+        NewsInfo: { title: "Title1", description: "NEWS1", IMG: "IMG1" }
+      })
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
   };
 
   //I could use query instead of e.target.name
