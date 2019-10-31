@@ -1,33 +1,27 @@
 import React, { Component } from "react";
 import NewsFramework from "./components/NewsFramework";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import "./App.css";
 import SearchPage from "./components/SearchPage";
 import Header from "./components/Header";
 
 export class App extends Component {
-  state = {
-    NewsList: [
-      {
-        id: 1,
-        NewsInfo: { title: "Title1", description: "NEWS1", IMG: "IMG1" }
-      },
-      {
-        id: 2,
-        NewsInfo: { title: "Title2", description: "NEWS2", IMG: "IMG2" }
-      },
-      {
-        id: 3,
-        NewsInfo: { title: "Title3", description: "NEWS3", IMG: "IMG3" }
-      }
-    ]
-  };
   render() {
     return (
-      <div className="App">
-        <Header />
-        <SearchPage />
-        <NewsFramework NewsList={this.state.NewsList} />
-      </div>
+      <Router>
+        <div className="container">
+          <Header />
+          <Route
+            path="/"
+            render={props => (
+              <React.Fragment>
+                <SearchPage />
+              </React.Fragment>
+            )}
+          />
+          <Route path="/Results" render={props => <NewsFramework />} />
+        </div>
+      </Router>
     );
   }
 }
