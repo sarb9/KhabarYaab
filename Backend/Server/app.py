@@ -32,8 +32,10 @@ def main():
 @app.route("/search", methods=['GET'])
 def search():
     # todo: search query method in BTree must be called here and results !
-    results = output_search_res
-    return jsonify({"news_headers": results})
+    if request.args.get("q"):
+        results = output_search_res
+        print("soorie")
+        return jsonify({"news_headers": results})
 
 
 @app.route("/news/<int:news_id>", methods=['GET'])
