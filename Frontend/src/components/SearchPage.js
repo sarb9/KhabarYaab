@@ -22,7 +22,11 @@ export class SearchPage extends Component {
 
   render() {
     return (
-      <form onSubmit={this.onSubmit} style={{ display: "flex" }}>
+      <form
+        className="searchBox"
+        onSubmit={this.onSubmit}
+        style={{ display: "flex" }}
+      >
         <input
           value={this.state.q}
           onChange={this.onQueryChange}
@@ -38,4 +42,4 @@ export class SearchPage extends Component {
   }
 }
 
-export default withRouter(SearchPage);
+export default SearchPage;

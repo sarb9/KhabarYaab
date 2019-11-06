@@ -15,7 +15,7 @@ export class NewsItem extends Component {
         </Link>
 
         <div>
-          <span>{description}</span> +{" "}
+          <span className="description">{description}</span>
           <span>
             <img className="image" src={IMG} alt="img here" />
           </span>
