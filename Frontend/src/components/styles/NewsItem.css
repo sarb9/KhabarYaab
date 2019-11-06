@@ -1,5 +1,10 @@
 .item {
-  background-color: #e0e0e0;
+  background-color: #f6f6f6;
   padding: 10px;
   margin-bottom: 1px;
+}
+
+.image {
+  width: 2;
+  float: right;
 }
