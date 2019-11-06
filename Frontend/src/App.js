@@ -16,7 +16,7 @@ export class App extends Component {
         <Header />
         <Switch>
           <div className="container">
-            <Route path="/" exact component={SearchPage} />
+            <Route path="/" component={SearchPage} />
             <Route path="/results" component={NewsFramework} />
             <Route path="/about" component={About} />
           </div>
