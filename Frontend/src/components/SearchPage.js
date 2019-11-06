@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "./styles/SearchPage.css";
-import { Redirect } from "react-router";
 import axios from "axios";
+import { withRouter } from "react-router-dom";
 
 export class SearchPage extends Component {
   state = {
@@ -11,30 +11,17 @@ export class SearchPage extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    axios
-      .post("https://jsonplaceholder.typicode.com/todos", {
-        id: 1,
-        NewsInfo: { title: "Title1", description: "NEWS1", IMG: "IMG1" }
-      })
-      .then(res => {
-        console.log(res);
-        this.setState({ redirect: true });
-      })
-      .catch(err => console.log(err));
+    this.props.history.push({
+      pathname: "/results",
+      q: this.state.q
+    });
   };
 
   //I could use query instead of e.target.name
   onQueryChange = e => this.setState({ [e.target.name]: e.target.value });
 
   render() {
-    return this.state.redirect ? (
-      <Redirect
-        to={{
-          pathname: "/results",
-          state: { id: "123" }
-        }}
-      />
-    ) : (
+    return (
       <form onSubmit={this.onSubmit} style={{ display: "flex" }}>
         <input
           value={this.state.q}
@@ -51,4 +38,4 @@ export class SearchPage extends Component {
   }
 }
 
-export default SearchPage;
+export default withRouter(SearchPage);
