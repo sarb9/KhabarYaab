@@ -12,6 +12,8 @@ xlrd = "*"
 hazm = "*"
 parsivar = "*"
 persianstemmer = "*"
+pytest = "*"
+wheel = "*"
 
 [requires]
 python_version = "3.7"
