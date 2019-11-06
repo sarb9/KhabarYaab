@@ -8,7 +8,12 @@ export class NewsFramework extends Component {
     NewsList: [
       {
         id: 1,
-        NewsInfo: { title: "Title1", description: "NEWS1", IMG: "IMG1" }
+        NewsInfo: {
+          title: "Title1",
+          description: "NEWS1",
+          IMG:
+            "https://image.shutterstock.com/image-photo/colorful-flower-on-dark-tropical-260nw-721703848.jpg"
+        }
       },
       {
         id: 2,
