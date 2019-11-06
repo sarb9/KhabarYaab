@@ -22,26 +22,38 @@ output_news_content = {"title": "پیروزی انقلاب یمن",
                        "img": "http://google.com",
                        "content": "میووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییوووووووو"},
 
+app = None
 
-@app.route("/")
-def main():
-    return render_template("index.html")
+class FlaskServer:
+    search_method = None
+    get_content_method = None
 
+    def __init__(self, search_method, get_content_method):
+        global app
+        EBUG = True
+        app = Flask(__name__)
+        app.config.from_object(__name__)
+        app.config['JSON_AS_ASCII'] = False
+        self.search_method = search_method
+        self.get_content_method = get_content_method
 
-@app.route("/search", methods=['GET'])
-def search():
-    # todo: search query method in BTree must be called here and results !
-    if request.args.get("q"):
-        results = output_search_res
-        print("soorie")
-        return jsonify({"news_headers": results})
+        @app.route("/")
+        def main():
+            return render_template("index.html")
 
+        @app.route("/search", methods=['GET'])
+        def search():
+            # todo: search query method in BTree must be called here and results !
+            if request.args.get("q"):
+                results = search_method(request.args.get("q"))
+                return jsonify({"news_headers": results})
 
-@app.route("/news/<int:news_id>", methods=['GET'])
-def get_news(news_id):
-    results = output_news_content
-    return jsonify(results)
+        @app.route("/news/<int:news_id>", methods=['GET'])
+        def get_news(news_id):
+            # results = output_news_content
+            results = get_content_method(news_id)
+            return jsonify(results)
 
-
-if __name__ == "__main__":
-    app.run()
+    def run(self):
+        global app
+        app.run()
