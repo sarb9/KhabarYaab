@@ -68,6 +68,7 @@ class Indexer:
 
         # add last word to the dictionary
         poslist.df = poslist.df
+
         dct[prev] = poslist
 
         for stop_word in STOP_WORDS:

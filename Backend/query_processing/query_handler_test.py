@@ -14,6 +14,7 @@ def test_query_extractor():
     # ans = query_handler.QueryHandler.extract_query_parts(query)
     # ans = query_handler.QueryHandler.extract_query_parts(
     # " \"نسبت سنجی مفاد\" ")
+    # " \"نسبت سنجی مفاد\" ")
     query = "اسرائیل !عملیات"
 
     query = '"خاک لبنان" "زندان دیگر" فلسطین از و برای به با'
@@ -22,9 +23,8 @@ def test_query_extractor():
     print(ans)
 
 
-@fixture(scope='module')
+# @fixture(scope='module')
 def query_handler_fix():
-
     print("loading corpus....")
     corpus = import_utils.load_corpus()
 
@@ -71,7 +71,11 @@ def test_query_retrieve_2(query_handler_fix):
     query = "اسرائیل عملیات"
     query = '"خاک لبنان" "زندان دیگر" فلسطین'
     query = '"مورد یمن" "تراژدی یمن" فلسطین'
-    ans = query_handler_fix.ask(query)
+    qh = query_handler_fix()
+    ans = qh.ask(query)
     print('--------------------------------------------------------------------------------')
 
     print(ans)
+
+
+test_query_retrieve_2(query_handler_fix)
