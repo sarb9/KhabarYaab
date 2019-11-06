@@ -21,8 +21,8 @@ export class App extends Component {
               </React.Fragment>
             )}
           />
-          <Route path="/Results" render={props => <NewsFramework />} />
-          <Route path="/About" render={props => <About />} />
+          <Route path="/results" render={props => <NewsFramework />} />
+          <Route path="/about" render={props => <About />} />
         </div>
       </Router>
     );

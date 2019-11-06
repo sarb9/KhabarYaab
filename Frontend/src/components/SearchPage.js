@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import "./styles/SearchPage.css";
+import { Redirect } from "react-router";
 import axios from "axios";
 
 export class SearchPage extends Component {
   state = {
-    query: ""
+    q: "",
+    redirect: false
   };
 
   onSubmit = e => {
@@ -14,7 +16,10 @@ export class SearchPage extends Component {
         id: 1,
         NewsInfo: { title: "Title1", description: "NEWS1", IMG: "IMG1" }
       })
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res);
+        this.setState({ redirect: true });
+      })
       .catch(err => console.log(err));
   };
 
@@ -22,12 +27,19 @@ export class SearchPage extends Component {
   onQueryChange = e => this.setState({ [e.target.name]: e.target.value });
 
   render() {
-    return (
+    return this.state.redirect ? (
+      <Redirect
+        to={{
+          pathname: "/results",
+          state: { id: "123" }
+        }}
+      />
+    ) : (
       <form onSubmit={this.onSubmit} style={{ display: "flex" }}>
         <input
-          value={this.state.query}
+          value={this.state.q}
           onChange={this.onQueryChange}
-          name="query"
+          name="q"
           className="searchField"
           type="txt"
         ></input>

@@ -21,7 +21,6 @@ export class NewsFramework extends Component {
   };
 
   componentDidMount() {
-    console.log("didmount");
     axios
       .get("https://jsonplaceholder.typicode.com/todos?_limit=10")
       .then(res => console.log(res.data));
@@ -44,7 +43,7 @@ export class NewsFramework extends Component {
   }
 
   render() {
-    console.log("here");
+    console.log(this.state);
     return this.state.NewsList.map(News => (
       <NewsItem key={News.id} News={News.NewsInfo} />
     ));
