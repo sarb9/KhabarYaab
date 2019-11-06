@@ -2,6 +2,7 @@ from collections import namedtuple
 from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
 from dictionary.posting import Posting
 from models import news_model
+from indexer import nindexer
 import re
 
 QueryPhrase = namedtuple('QueryPhrase', ['b', 'terms'])
@@ -92,13 +93,13 @@ class QueryHandler:
 
         parts = re.findall(r'!?\".*?\"', query)
 
-        parts[:] = [part[1:-1].strip() for part in parts]
-
-        parts[:] = [QueryPhrase(True, re.split(' +', part)) if part[0] != '!'
-                    else QueryPhrase(False, re.split(' +', part)) for part in parts]
+        parts[:] = [QueryPhrase(True, re.split(' +', part[1:-1].strip())) if part[0] != '!'
+                    else QueryPhrase(False, re.split(' +', part[2:-1])) for part in parts]
 
         query = re.sub(r"\".*?\"", '', query)
         query_parts = re.split(' +', query)
+        query_parts[:] = [
+            token for token in query_parts if token not in nindexer.STOP_WORDS]
         parts += [QueryPhrase(True, (part,)) if part[0] != '!'
                   else QueryPhrase(False, (part[1:], )) for part in query_parts if len(part) > 0]
 

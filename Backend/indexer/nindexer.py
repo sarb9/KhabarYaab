@@ -1,6 +1,7 @@
 from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
 from models.news_model import NewsModel
-import pickle, os.path
+import pickle
+import os.path
 from dictionary.posting import Posting
 from collections import namedtuple
 from dictionary import dictionary, posting
@@ -8,6 +9,10 @@ from dictionary import dictionary, posting
 from ling_modules import pipline, normalizer, tokenizer, stemmer
 
 Occurance = namedtuple('Occurance', ['term', 'posting'])
+STOP_WORDS = ("چه", "اگر", "همه", "نه", "آنها",
+              "باید", "هر", "او", "ما", "من", "تا",
+              "نیز", "اما", "یک", "خود", "بر",
+              "یا", "هم", "را", "این", "با", "آن", "برای", "و", "در", "به", "که", "از")
 
 
 class Indexer:
@@ -17,13 +22,17 @@ class Indexer:
         self.pipline = pipline.Pipeline(
             normalizer.Normalizer(), tokenizer.Tokenizer(), stemmer.Stemmer())
 
-    def feed(self, models):
+    def feed(self, models, force=False):
+
+        if not force and os.path.exists('data/dictionary_obj.pkl'):
+            return
+
         for model in models:
             tokens = self.pipline.feed(model.content)
             for i, term in enumerate(tokens):
                 self.index.append(Occurance(term, Posting(model.id, i)))
 
-    def create_dictionary(self, from_scratch):
+    def create_dictionary(self, from_scratch=False):
 
         def save_dictionary(dct):
             with open('data/dictionary_obj.pkl', 'wb') as output:
@@ -35,6 +44,7 @@ class Indexer:
 
         if not from_scratch and os.path.exists('data/dictionary_obj.pkl'):
             return load_dictionary()
+
         self.index.sort()
         dct = dictionary.Dictionary()
 
@@ -59,5 +69,9 @@ class Indexer:
         # add last word to the dictionary
         poslist.df = poslist.df
         dct[prev] = poslist
+
+        for stop_word in STOP_WORDS:
+            del dct[stop_word]
+
         save_dictionary(dct)
         return dct

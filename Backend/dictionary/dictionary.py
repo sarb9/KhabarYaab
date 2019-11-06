@@ -5,7 +5,8 @@ class Dictionary(UserDict):
 
     def __missing__(self, key):
         if isinstance(key, str):
-            raise KeyError(key)
+            print("MISS: ##############################",
+                  key, "##############################")
         else:
             return self.data[str(key)]
 
