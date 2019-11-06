@@ -1,5 +1,7 @@
 from collections import namedtuple
+from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
 from dictionary.posting import Posting
+from models import news_model
 import re
 
 QueryPhrase = namedtuple('QueryPhrase', ['b', 'terms'])
@@ -9,25 +11,36 @@ class QueryHandler:
 
     def __init__(self, dct):
         self.dct = dct
+        self.pipline = pipline.Pipeline(
+            normalizer.Normalizer(), stemmer.Stemmer())
 
     def ask(self, query):
         query_phrases = self.extract_query_parts(query)
+        print(query_phrases, " ()))() query phrases")
 
-        ans = set(self.dct.keys())
+        ans = set(i for i in range(news_model.NewsModel.gid))
         for qp in query_phrases:
-            self.retrive(qp)
+            docs = self.retrive(qp)
+            print(docs)
+            if qp.b:
+                ans = ans & docs
+                print(ans)
+            else:
+                ans = ans - docs
+
+        return ans
 
     def retrive(self, qp):
-        docs = []
-        print("----------------------------------------------------------------------")
-        print(qp)
+        docs = set()
+        # print("----------------------------------------------------------------------")
+        # print(qp)
 
-        for term in qp.terms:
-            print(term, ": ---------------------------------------------------------")
-            print(self.dct[term])
-            print()
-            print()
-        print("************************************************************")
+        # for term in qp.terms:
+        ##print(term, ": ---------------------------------------------------------")
+        # print(self.dct[term])
+        # print()
+        # print()
+        # print("************************************************************")
 
         pointer = {term: 0 for term in qp.terms}
 
@@ -46,11 +59,11 @@ class QueryHandler:
 
         pos0 = get_post(qp.terms[0])
         while pos0:
-            print("-------->", pos0)
+            ##print("-------->", pos0)
 
             flag = True
             target = Posting(*pos0)
-            print(target)
+            # print(target)
 
             for token in qp.terms[1:]:
 
@@ -61,32 +74,35 @@ class QueryHandler:
                     token_post = inc_post(token)
 
                 if token_post and token_post == target:
-                    print("OK")
+                    # print("OK")
                     continue
                 else:
-                    print("FALSE on", token, target)
+                    ##print("FALSE on", token, target)
                     flag = False
                     break
             if flag:
-                print(target)
-                docs.append(target.doc_id)
+                docs.add(target.doc_id)
 
             pos0 = inc_post(qp.terms[0])
 
         return docs
 
-    @classmethod
-    def extract_query_parts(cls, query):
+    def extract_query_parts(self, query):
         query = query.strip()
 
-        parts = re.findall(r'!?\".*\"', query)
+        parts = re.findall(r'!?\".*?\"', query)
+
         parts[:] = [part[1:-1].strip() for part in parts]
+
         parts[:] = [QueryPhrase(True, re.split(' +', part)) if part[0] != '!'
                     else QueryPhrase(False, re.split(' +', part)) for part in parts]
 
-        query = re.sub(r"\".*\"", '', query)
+        query = re.sub(r"\".*?\"", '', query)
         query_parts = re.split(' +', query)
         parts += [QueryPhrase(True, (part,)) if part[0] != '!'
-                  else QueryPhrase(False, (part, )) for part in query_parts if len(part) > 0]
+                  else QueryPhrase(False, (part[1:], )) for part in query_parts if len(part) > 0]
+
+        parts[:] = [QueryPhrase(part.b, [self.pipline.feed(term)
+                                         for term in part.terms]) for part in parts]
 
         return parts

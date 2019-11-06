@@ -5,17 +5,21 @@ from indexer import nindexer
 from pytest import fixture
 from query_handler import QueryHandler, QueryPhrase
 
-'''
+
 def test_query_extractor():
+    qh = query_handler.QueryHandler(dict())
     query = "    سرمایه گذاری میلیاردی رو پروژه ساخت \"سد خاکی\" !سابقه  "
     query = " گزارش های مربوط به \" ساخت سد \" ۵۰ متری !خاکی "
-    # query = " salam \" vali nemishe \" chera "
+    query = " salam \" vali nemishe \" chera "
     # ans = query_handler.QueryHandler.extract_query_parts(query)
-    print()
-    ans = query_handler.QueryHandler.extract_query_parts(" \"نسبت سنجی مفاد\" ")[
-        0]
+    # ans = query_handler.QueryHandler.extract_query_parts(
+    # " \"نسبت سنجی مفاد\" ")
+    query = "اسرائیل !عملیات"
+
+    query = '"خاک لبنان" "زندان دیگر" فلسطین'
+
+    ans = qh.extract_query_parts(query)
     print(ans)
-'''
 
 
 @fixture(scope='module')
@@ -57,12 +61,16 @@ def test_query_retrieve_2(query_handler_fix):
     print('--------------------------------------------------------------------------------')
     # ans = query_handler.QueryHandler.extract_query_parts(
     # "\"ناشر موظف است\"")[0]
-    ans = query_handler.QueryHandler.extract_query_parts("\"گرماب\"")[0]
-    ans = query_handler.QueryHandler.extract_query_parts(
-        "\"هنوز    سنگ    قبر  \"")[0]
-    ans = query_handler.QueryHandler.extract_query_parts(
-        "\"آملی لاریجانی در زمان فعالیت\" ")[0]
-    print(ans)
-    ans = query_handler_fix.retrive(ans)
+    # ans = query_handler.QueryHandler.extract_query_parts("\"گرماب\"")[0]
+    # ans = query_handler.QueryHandler.extract_query_parts(
+    # "\"هنوز    سنگ    قبر  \"")[0]
+    # ans = query_handler.QueryHandler.extract_query_parts(
+    # "\"آملی لاریجانی در زمان فعالیت\" ")[0]
+    # ans = query_handler.QueryHandler.extract_query_parts(
+    # "\"داخل پارکینگ\" \"انتقال جسد\" سوپ")
+    query = "اسرائیل عملیات"
+    query = '"خاک لبنان" "زندان دیگر" فلسطین'
+    ans = query_handler_fix.ask(query)
     print('--------------------------------------------------------------------------------')
+
     print(ans)

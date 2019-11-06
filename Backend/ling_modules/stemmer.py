@@ -13,7 +13,7 @@ class Stemmer:
         return self.stemmer.stem(text)
 
     def __call__(self, text):
-        if isinstance(text, Iterable):
+        if isinstance(text, list):
             return [self.stemmer.stem(t) for t in text]
         else:
             return self.stemmer.stem(text)
