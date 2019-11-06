@@ -1,13 +1,19 @@
 import React, { Component } from "react";
 import "./styles/NewsItem.css";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
 export class NewsItem extends Component {
   render() {
+    console.log(this.props);
     const { title, description, IMG } = this.props.News;
+    const id = this.props.id;
     return (
       <div className="item">
-        <p>{title} </p>
+        <Link to={`/result/${id}`}>
+          <p>{title} </p>
+        </Link>
+
         <div>
           <span>{description}</span> + <span>{IMG}</span>
         </div>

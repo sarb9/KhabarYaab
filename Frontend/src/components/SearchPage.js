@@ -1,21 +1,20 @@
 import React, { Component } from "react";
 import "./styles/SearchPage.css";
 import axios from "axios";
+import { withRouter } from "react-router-dom";
 
 export class SearchPage extends Component {
   state = {
-    query: ""
+    q: "",
+    redirect: false
   };
 
   onSubmit = e => {
     e.preventDefault();
-    axios
-      .post("https://jsonplaceholder.typicode.com/todos", {
-        id: 1,
-        NewsInfo: { title: "Title1", description: "NEWS1", IMG: "IMG1" }
-      })
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
+    this.props.history.push({
+      pathname: "/results",
+      q: this.state.q
+    });
   };
 
   //I could use query instead of e.target.name
@@ -25,9 +24,9 @@ export class SearchPage extends Component {
     return (
       <form onSubmit={this.onSubmit} style={{ display: "flex" }}>
         <input
-          value={this.state.query}
+          value={this.state.q}
           onChange={this.onQueryChange}
-          name="query"
+          name="q"
           className="searchField"
           type="txt"
         ></input>
@@ -39,4 +38,4 @@ export class SearchPage extends Component {
   }
 }
 
-export default SearchPage;
+export default withRouter(SearchPage);
