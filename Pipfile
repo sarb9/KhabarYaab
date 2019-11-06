@@ -9,8 +9,6 @@ autopep8 = "*"
 [packages]
 xlrd = "*"
 hazm = "*"
-parsivar = "*"
-persianstemmer = "*"
 pytest = "*"
 wheel = "*"
 
