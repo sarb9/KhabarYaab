@@ -23,7 +23,7 @@ def test_query_extractor():
     print(ans)
 
 
-# @fixture(scope='module')
+@fixture(scope='module')
 def query_handler_fix():
     print("loading corpus....")
     corpus = import_utils.load_corpus()

@@ -3,12 +3,13 @@ from models import news_model
 from indexer import nindexer
 from query_handler import QueryHandler, QueryPhrase
 from Server import app
+import copy
 
 
 def get_news_content(id):
     news_model_view = mdls[id]
     result = {"thumbnail": news_model_view.thumbnail, "title": news_model_view.title,
-              "content": news_model_view.content, "publish_date": news_model_view.publish_date,
+              "content": mdls_with_tags[id].content, "publish_date": news_model_view.publish_date,
               "summary": news_model_view.summary, "url": news_model_view.url, "meta_tags": news_model_view.meta_tags}
 
     return result
@@ -31,20 +32,23 @@ def get_news_headers(query):
 
 def highlight_phrases_in_content(content, query_phrases):
     result = ""
+    highlighted_content = content
 
     def get_lower_bound(index):
         if index - threshold < 0:
             return 0
         else:
-            return index - threshold
+            for i in range(index - threshold, len(highlighted_content)):
+                if highlighted_content[i] == " ":
+                    return i
 
     def get_upper_bound(index):
         if index + threshold > len(content):
             return len(content)
         else:
-            return index + threshold
-
-    highlighted_content = content
+            for i in range(index + threshold, 0, -1):
+                if highlighted_content[i] == " ":
+                    return i
 
     def bold_phrases(highlighted_content):
         phrases = []
@@ -74,12 +78,12 @@ def highlight_phrases_in_content(content, query_phrases):
         if prev_index is None:
             lower_index = get_lower_bound(index)
         elif index - prev_index > threshold:
-            result += highlighted_content[lower_index: upper_index] + " ... "
+            result += highlighted_content[lower_index: upper_index] + "..."
             lower_index = get_lower_bound(index)
         upper_index = get_upper_bound(index)
         prev_index = index
 
-    result += highlighted_content[lower_index: upper_index]
+    result += highlighted_content[lower_index: upper_index] + "..."
     return result
 
 
@@ -88,6 +92,10 @@ corpus = import_utils.load_corpus()
 
 print("indexing...")
 mdls = news_model.create_models_list_from_news(corpus)
+mdls_with_tags = copy.deepcopy(mdls)
+for model in mdls:
+    import_utils.remove_tags(model)
+
 ind = nindexer.Indexer()
 ind.feed(mdls)
 print("creating dictionary...")
