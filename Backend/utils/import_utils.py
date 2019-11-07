@@ -6,7 +6,7 @@ DATA_LOC = "data/news1.xlsx"
 
 
 def remove_tags(news_model):
-    news_model.content = BeautifulSoup(news_model.content, "lxml").text
+    news_model.content = BeautifulSoup(news_model.content, 'lxml').text
     return news_model
 
 
