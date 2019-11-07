@@ -12,6 +12,7 @@ hazm = "*"
 pytest = "*"
 wheel = "*"
 lxml = "*"
+BeautifulSoup4 = "*"
 flask = "*"
 [requires]
 python_version = "3.7"
