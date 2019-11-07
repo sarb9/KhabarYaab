@@ -6,7 +6,13 @@
 
 .searchField {
   flex: 10;
-  padding: 5px;
+  width: 100%;
+  padding: 10px;
+  margin-left: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font: 150%;
 }
 
 .btn {

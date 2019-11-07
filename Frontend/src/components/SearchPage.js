@@ -1,24 +1,34 @@
 import React, { Component } from "react";
 import "./styles/SearchPage.css";
-import axios from "axios";
 import { withRouter } from "react-router-dom";
 
 export class SearchPage extends Component {
   state = {
-    q: "",
+    q: null,
     redirect: false
   };
 
   onSubmit = e => {
     e.preventDefault();
-    this.props.history.push({
-      pathname: "/results",
-      q: this.state.q
-    });
+    if (this.props.location.pathname != "/results") {
+      console.log("sending ", this.state.q);
+      this.props.history.push({
+        pathname: "/results",
+        q: this.state.q
+      });
+    } else {
+      this.props.onQueryChange(this.state.q);
+    }
   };
 
-  //I could use query instead of e.target.name
-  onQueryChange = e => this.setState({ [e.target.name]: e.target.value });
+  //I could use q instead of e.target.name
+  onTextChange = e => this.setState({ [e.target.name]: e.target.value });
+
+  componentDidMount() {
+    if (this.props.q_history != undefined) {
+      this.setState({ q: this.props.q_history });
+    }
+  }
 
   render() {
     return (
@@ -27,19 +37,21 @@ export class SearchPage extends Component {
         onSubmit={this.onSubmit}
         style={{ display: "flex" }}
       >
+        <button dir="rtl" className="btn" method="Submit">
+          برو !
+        </button>
         <input
+          dir="rtl"
           value={this.state.q}
-          onChange={this.onQueryChange}
+          onChange={this.onTextChange}
           name="q"
           className="searchField"
           type="txt"
+          placeholder="عبارت مدنظرتان را وارد کنید"
         ></input>
-        <button className="btn" method="Submit">
-          Go !
-        </button>
       </form>
     );
   }
 }
 
-export default SearchPage;
+export default withRouter(SearchPage);

@@ -44,7 +44,9 @@ export default class News extends Component {
     ) : (
       <div dir="rtl">
         <div className="page-header">
-          <h1 className="title">{this.state.title}</h1>
+          <div className="title">
+            <div className="title-text">{this.state.title} </div>
+          </div>
           <img
             className="page-image"
             src={this.state.thumbnail}
@@ -60,7 +62,7 @@ export default class News extends Component {
         </div>
         <div className="footer">
           <span>تاریخ انتشار : {this.state.publish_date}</span>
-          <a className="site-link" href={this.state.url}>
+          <a className="site-link" href={"https://www." + this.state.url}>
             لینک به خبر اصلی
           </a>
         </div>

@@ -19,6 +19,7 @@ export class App extends Component {
           <div className="container">
             <Route path="/" exact component={SearchPage} />
             <Route path="/results" exact component={NewsFramework} />
+            {/* <Route path="/results2" exact component={NewsFramework} /> */}
             <Route path="/results/:id" component={News} />
             <Route path="/about" component={About} />
           </div>

@@ -6,10 +6,23 @@
   background: ghostwhite;
   position: relative;
   /* background: cyan; */
+  height: 20vw;
 }
 .title {
   margin-top: 3rem;
+  width: 80%;
+  word-wrap: break-word;
   display: inline-block;
+}
+
+.title-text {
+  position: absolute;
+  width: 80%;
+  word-wrap: break-word;
+  font-size: 22pt;
+  color: #333;
+  font-weight: 600;
+  top: 35%;
 }
 
 .page-body {
@@ -19,8 +32,8 @@
 }
 
 .page-image {
-  width: 7rem;
-  height: 7rem;
+  width: 20%;
+  height: 100%;
   left: 0%;
   display: inline-block;
   position: absolute;
