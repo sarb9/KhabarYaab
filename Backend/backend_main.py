@@ -63,7 +63,7 @@ def highlight_phrases_in_content(content, query_phrases):
         return highlighted_content, phrases
 
     highlighted_content, phrases = bold_phrases(highlighted_content)
-    threshold = 60 - 6 * len(phrases)
+    threshold = 80 - 6 * len(phrases)
     if threshold < 20:
         threshold = 20
 
