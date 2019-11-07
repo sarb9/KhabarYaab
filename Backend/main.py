@@ -18,21 +18,26 @@ def get_news_content(id):
 
 
 def get_news_headers(query):
+    print("your query: ", query)
     ans = qh.ask(query)
     results = []
     for id in ans:
         news_model_view = mdls[id]
-        results.append({"thumbnail": news_model_view.thumbnail, "title": news_model_view.title,
-                        "summary": news_model_view.summary, "publish_date": news_model_view.publish_date})
+        results.append(
+            {"id": news_model_view.id, "thumbnail": news_model_view.thumbnail, "title": news_model_view.title,
+             "summary": news_model_view.summary, "publish_date": news_model_view.publish_date})
 
     return results
 
 
 corpus = import_utils.load_corpus()
+print("reading from corpus...")
 mdls = news_model.create_models_list_from_news(corpus)
 ind = nindexer.Indexer()
 ind.feed(mdls)
+print("indexing...")
 dct = ind.create_dictionary()
+print("creating dictionary...")
 qh = QueryHandler(dct)
 flask_app = app.FlaskServer(get_news_headers, get_news_content)
 flask_app.run()
