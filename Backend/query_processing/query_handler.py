@@ -17,7 +17,7 @@ class QueryHandler:
 
     def ask(self, query):
         query_phrases = self.extract_query_parts(query)
-        print(query_phrases, " ()))() query phrases")
+        # print(query_phrases, " ()))() query phrases")
 
         ans = set(i for i in range(news_model.NewsModel.gid))
         for qp in query_phrases:
@@ -88,7 +88,7 @@ class QueryHandler:
 
         return docs
 
-    def extract_query_parts(self, query):
+    def extract_query_parts(self, query, without_pipeline=False):
         query = query.strip()
 
         parts = re.findall(r'!?\".*?\"', query)
@@ -102,8 +102,8 @@ class QueryHandler:
             token for token in query_parts if token not in nindexer.STOP_WORDS]
         parts += [QueryPhrase(True, (part,)) if part[0] != '!'
                   else QueryPhrase(False, (part[1:], )) for part in query_parts if len(part) > 0]
-
-        parts[:] = [QueryPhrase(part.b, [self.pipline.feed(term)
-                                         for term in part.terms]) for part in parts]
+        if not without_pipeline:
+            parts[:] = [QueryPhrase(part.b, [self.pipline.feed(term)
+                                             for term in part.terms]) for part in parts]
 
         return parts

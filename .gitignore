@@ -3,3 +3,4 @@ env
 .idea
 Frontend/node_modules
 .Ds_store
+data/dictionary_obj.pkl

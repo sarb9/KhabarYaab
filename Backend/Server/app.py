@@ -1,28 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 
 # App config.
-DEBUG = True
+DEBUG = False
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['JSON_AS_ASCII'] = False
 
-output_search_res = [
-    {"title": "milad", "description": ",سپاه پاسداران جمهوری اسلامی ایران سپاه پاسداران جمهوری اسلامی ایران ",
-     "img": "http://google.com"},
-    {"title": "arad", "description": "خرمشهرررررر آزاد شددددددد ",
-     "img": "http://google.me"},
-    {"title": "alireza", "description": "قیمت دلااررر کاهش یافتتتتتتتت ",
-     "img": "http://google.you"},
-    {"title": "mehdi", "description": ",دستگیری دو عامل دزدی در بازار تهران ",
-     "img": "http://google.him"}
-]
-
-output_news_content = {"title": "پیروزی انقلاب یمن",
-                       "description": ",سپاه پاسداران جمهوری اسلامی ایران سپاه پاسداران جمهوری اسلامی ایران ",
-                       "img": "http://google.com",
-                       "content": "میووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییمیووویصصشیشصیشصییوووووووو"},
-
 app = None
+
 
 class FlaskServer:
     search_method = None
@@ -56,4 +41,4 @@ class FlaskServer:
 
     def run(self):
         global app
-        app.run()
+        app.run(threaded=False, processes=1)
