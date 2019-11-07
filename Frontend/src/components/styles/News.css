@@ -1,0 +1,39 @@
+.page-header {
+  border-style: ridge;
+  border-color: greenyellow;
+  border-bottom: none;
+  border-width: 1px;
+  background: ghostwhite;
+  position: relative;
+  /* background: cyan; */
+}
+.title {
+  margin-top: 3rem;
+  display: inline-block;
+}
+
+.page-body {
+  border-style: ridge;
+  border-color: red;
+  border-width: 1px;
+}
+
+.page-image {
+  width: 7rem;
+  height: 7rem;
+  left: 0%;
+  display: inline-block;
+  position: absolute;
+}
+
+.summary {
+  display: block;
+}
+
+.footer {
+  border: 1px dotted;
+}
+
+.site-link {
+  float: left;
+}

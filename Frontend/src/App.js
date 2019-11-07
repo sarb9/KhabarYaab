@@ -5,6 +5,7 @@ import "./App.css";
 import SearchPage from "./components/SearchPage";
 import Header from "./components/Header";
 import About from "./components/About";
+import News from "./components/News";
 import createHistory from "history/createBrowserHistory";
 
 const history = createHistory();
@@ -16,8 +17,9 @@ export class App extends Component {
         <Header />
         <Switch>
           <div className="container">
-            <Route path="/" component={SearchPage} />
-            <Route path="/results" component={NewsFramework} />
+            <Route path="/" exact component={SearchPage} />
+            <Route path="/results" exact component={NewsFramework} />
+            <Route path="/results/:id" component={News} />
             <Route path="/about" component={About} />
           </div>
         </Switch>
