@@ -5,6 +5,8 @@ from models import news_model
 from indexer import nindexer
 import re
 
+# from indexer.nindexer import check_case_folding
+
 QueryPhrase = namedtuple('QueryPhrase', ['b', 'terms'])
 
 
@@ -17,7 +19,7 @@ class QueryHandler:
 
     def ask(self, query):
         query_phrases = self.extract_query_parts(query)
-        # print(query_phrases, " ()))() query phrases")
+        print(query_phrases, "    query phrasesssssss")
 
         ans = set(i for i in range(news_model.NewsModel.gid))
         for qp in query_phrases:
@@ -101,9 +103,9 @@ class QueryHandler:
         query_parts[:] = [
             token for token in query_parts if token not in nindexer.STOP_WORDS]
         parts += [QueryPhrase(True, (part,)) if part[0] != '!'
-                  else QueryPhrase(False, (part[1:], )) for part in query_parts if len(part) > 0]
+                  else QueryPhrase(False, (part[1:],)) for part in query_parts if len(part) > 0]
         if not without_pipeline:
-            parts[:] = [QueryPhrase(part.b, [self.pipline.feed(term)
+            parts[:] = [QueryPhrase(part.b, [self.pipline.feed([term])[0]
                                              for term in part.terms]) for part in parts]
 
         return parts

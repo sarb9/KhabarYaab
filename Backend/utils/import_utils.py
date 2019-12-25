@@ -17,3 +17,4 @@ def load_corpus(loc=DATA_LOC):
             for r in range(sheet.nrows)]
     del news[0]  # delete headers
     return news
+

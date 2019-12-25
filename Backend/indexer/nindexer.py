@@ -9,10 +9,21 @@ from dictionary import dictionary, posting
 from ling_modules import pipline, normalizer, tokenizer, stemmer
 
 Occurance = namedtuple('Occurance', ['term', 'posting'])
+
 STOP_WORDS = ("چه", "اگر", "همه", "نه", "آنها",
               "باید", "هر", "او", "ما", "من", "تا",
               "نیز", "اما", "یک", "خود", "بر",
               "یا", "هم", "را", "این", "با", "آن", "برای", "و", "در", "به", "که", "از")
+
+
+
+    # try:
+    #     case_folding.index(term)
+    #     termm = case_folding[1]
+    #     print(termm + "asdfasdfasdf")
+    # except:
+    #     termm = term
+    #     print(termm + "heeee")
 
 
 class Indexer:
@@ -30,6 +41,7 @@ class Indexer:
         for model in models:
             tokens = self.pipline.feed(model.content)
             for i, term in enumerate(tokens):
+                # termm = check_case_folding(term)
                 self.index.append(Occurance(term, Posting(model.id, i)))
 
     def create_dictionary(self, from_scratch=False):
