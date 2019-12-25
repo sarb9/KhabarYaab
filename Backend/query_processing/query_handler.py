@@ -56,7 +56,7 @@ class QueryHandler:
                 if term in doc:
                     score += doc[term] * term_freq
             answers[doc_id] = score / \
-                              (self.calc_length(doc) * self.calc_length(vector))
+                (self.calc_length(doc) * self.calc_length(vector))
 
         print("*******************************8")
         for doc_id, score in answers.items():
