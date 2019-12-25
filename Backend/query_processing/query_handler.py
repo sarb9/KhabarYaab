@@ -55,7 +55,7 @@ class QueryHandler:
             elif SCORING_MODE == 2:
                 vector[term] = log(1 + len(self.dct.docs) / self.dct[term].df)
             elif SCORING_MODE == 3:
-                print("000000000000", len(self.dct.docs) , len(self.dct.docs) / self.dct[term].df)
+                print("000000000000", len(self.dct.docs), len(self.dct.docs) / self.dct[term].df)
                 vector[term] = (1 + log(term_freq)) * log(len(self.dct.docs) / self.dct[term].df)
 
             # vector[term] = 1 + log(term_freq)
@@ -69,7 +69,7 @@ class QueryHandler:
                     score += doc[term] * term_freq
 
             answers[doc_id] = score / \
-                (self.calc_length(doc) * self.calc_length(vector))
+                              (self.calc_length(doc) * self.calc_length(vector))
 
         return self.get_best_k_news(answers)
 
