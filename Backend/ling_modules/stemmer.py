@@ -2,8 +2,29 @@ import pickle
 import re
 from ling_modules.tokenizer import load_from_file
 
+# CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"], ["بلیت", "بلیط"])
+CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"], ["بلیت", "بلیط"], ["طوفان", "توفان"])
+
+
+# CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"])
+
+
+def add_similars(phrase):
+    for case in CASE_FOLDING:
+        if phrase in case:
+            return case
+    return []
+
 
 class Stemmer:
+
+    def check_case_folding(self, term):
+        for case_folding in CASE_FOLDING:
+            if term in case_folding:
+                print(case_folding[0], "yum yummyy, boood")
+                return case_folding[0]
+
+        return term
 
     def __init__(self):
         self.verb_stems = load_stem_pickle()
