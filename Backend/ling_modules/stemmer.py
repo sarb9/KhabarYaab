@@ -55,11 +55,14 @@ def stemmer(term):
                     term = re.sub(pattern=prefix, repl=r"\1", string=term)  # remove other_prefix from word
                 return True, term
 
-        #Todo: Verb Stemming need to be handled --->
+        for verb in verb_stems:
+            # for Mazi and Mozare Sade
+            sade_pattern = verb + "([م|ی|د|یم|ید|ند])"
+            # for Mazi Naghli
+            naghli_pattern = verb + "ه" + "\u200c" + "([ام|ای|است|ایم|اید|اند])"
+            if re.search(sade_pattern + r"|" + naghli_pattern, term):
+                return True, verb
 
-        # for verb in verb_stems:
-        #     if verb in term:
-        #         return True, verb
         return False, term
 
     def check_noun_stem(term):
@@ -116,6 +119,3 @@ def load_irregular_noun():
         for line in file:
             nouns.append(line.strip().split("\t"))
     return nouns
-
-
-stemmer("گندمزار")
