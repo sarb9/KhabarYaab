@@ -1,4 +1,3 @@
-import hazm
 import re
 from ling_modules.pipline import Pipeline
 
