@@ -21,7 +21,7 @@ class Stemmer:
     def check_case_folding(self, term):
         for case_folding in CASE_FOLDING:
             if term in case_folding:
-                print(case_folding[0], "yum yummyy, boood")
+                # print(case_folding[0], "yum yummyy, boood")
                 return case_folding[0]
 
         return term
