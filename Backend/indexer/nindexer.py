@@ -5,6 +5,7 @@ import os.path
 from dictionary.posting import Posting
 from collections import namedtuple
 from dictionary import dictionary, posting
+from dictionary.document import Document
 
 from ling_modules import pipline, normalizer, tokenizer, stemmer
 
@@ -30,6 +31,7 @@ class Indexer:
 
     def __init__(self):
         self.index = []
+        self.dct = dictionary.Dictionary()
         self.pipline = pipline.Pipeline(
             normalizer.Normalizer(), tokenizer.Tokenizer(), stemmer.Stemmer())
 
@@ -40,6 +42,9 @@ class Indexer:
 
         for model in models:
             tokens = self.pipline.feed(model.content)
+            doc = Document(tokens)
+            self.dct.add_doc(doc)
+
             for i, term in enumerate(tokens):
                 # termm = check_case_folding(term)
                 self.index.append(Occurance(term, Posting(model.id, i)))
@@ -58,7 +63,6 @@ class Indexer:
             return load_dictionary()
 
         self.index.sort()
-        dct = dictionary.Dictionary()
 
         prev = None
         prev_d = None
@@ -68,7 +72,7 @@ class Indexer:
             if occ.term != prev and prev != None:
                 poslist.df = poslist.df
                 prev_d = None
-                dct[prev] = poslist
+                self.dct[prev] = poslist
                 poslist = posting.PostingList()
 
             if prev_d != occ.posting.doc_id:
@@ -80,11 +84,12 @@ class Indexer:
 
         # add last word to the dictionary
         poslist.df = poslist.df
+        self.dct[prev] = poslist
 
-        dct[prev] = poslist
+        self.dct.calc_tf_idf()
 
         for stop_word in STOP_WORDS:
-            del dct[stop_word]
+            del self.dct[stop_word]
 
-        save_dictionary(dct)
-        return dct
+        save_dictionary(self.dct)
+        return self.dct

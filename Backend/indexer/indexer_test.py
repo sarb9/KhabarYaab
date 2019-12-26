@@ -19,6 +19,12 @@ def test_index(models):
     ind.feed(models)
     dct = ind.create_dictionary()
 
-    # for term, pl in dct.items():
-    # print([i.doc_id for i in pl])
-    # print(term + ", tf:" + str(len(pl)) + ", df:" + str(pl.df))
+
+def test_term_frequency(models):
+    ind = nindexer.Indexer()
+    ind.feed(models)
+    print("==============================")
+    print(ind.dct.docs[0].terms)
+    print("==============================")
+    print(ind.dct.docs[1].terms)
+    print("==============================")

@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 
-import hazm
 from PersianStemmer import PersianStemmer
 
 # CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"], ["بلیت", "بلیط"])
@@ -31,10 +30,11 @@ class Stemmer:
         self.stemmer = PersianStemmer()
 
     def stem(self, text):
-        return self.stemmer.stem(text)
+        return self.stemmer.run(text)
 
     def __call__(self, text):
         if isinstance(text, list):
+
             print("hereeeeeeeeeeeee")
             return [self.stemmer.stem(self.check_case_folding(t)) for t in text]
         else:

@@ -58,7 +58,6 @@ def test_query_retrieve(query_handler_fix):
 
 
 def test_query_retrieve_2(query_handler_fix):
-    print('--------------------------------------------------------------------------------')
     # ans = query_handler.QueryHandler.extract_query_parts(
     # "\"ناشر موظف است\"")[0]
     # ans = query_handler.QueryHandler.extract_query_parts("\"گرماب\"")[0]
@@ -71,11 +70,9 @@ def test_query_retrieve_2(query_handler_fix):
     query = "اسرائیل عملیات"
     query = '"خاک لبنان" "زندان دیگر" فلسطین'
     query = '"مورد یمن" "تراژدی یمن" فلسطین'
-    qh = query_handler_fix()
-    ans = qh.ask(query)
+    query = "تهران ایران"
+    ans = query_handler_fix.ask(query)
+
     print('--------------------------------------------------------------------------------')
-
     print(ans)
-
-
-test_query_retrieve_2(query_handler_fix)
+    print('--------------------------------------------------------------------------------')
