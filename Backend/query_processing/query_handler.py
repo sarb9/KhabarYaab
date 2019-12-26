@@ -5,9 +5,10 @@ from models import news_model
 from indexer import nindexer
 from math import log, sqrt
 import re
+import heapq
 
 # from indexer.nindexer import check_case_folding
-
+best_k = 30
 QueryPhrase = namedtuple('QueryPhrase', ['b', 'terms'])
 
 
@@ -55,20 +56,29 @@ class QueryHandler:
                 if term in doc:
                     score += doc[term] * term_freq
             answers[doc_id] = score / \
-                (self.calc_length(doc) * self.calc_length(vector))
+                              (self.calc_length(doc) * self.calc_length(vector))
 
         print("*******************************8")
         for doc_id, score in answers.items():
             print(doc_id, score)
         print("*******************************8")
 
-        return [k for k, v in sorted(answers.items(), key=lambda item: item[1])]
+        # return [k for k, v in sorted(answers.items(), key=lambda item: item[1])]
+        return self.get_best_k_news(answers)
 
     def calc_length(self, vector):
         s = 0
         for tfidf in vector.values():
             s += tfidf ** 2
         return sqrt(s)
+
+    def get_best_k_news(self, ans_dct):
+        k = min(best_k, len(ans_dct))
+        heap = [(-value, key) for key, value in ans_dct.items()]
+        largest = heapq.nsmallest(k, heap)
+        largest = [(key, -value) for value, key in largest]
+        print("lahrgesttt::       ", largest)
+        return [k[0] for k in largest]
 
     def retrive(self, qp):
         docs = set()
