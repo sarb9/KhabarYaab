@@ -17,14 +17,13 @@ STOP_WORDS = ("چه", "اگر", "همه", "نه", "آنها",
               "یا", "هم", "را", "این", "با", "آن", "برای", "و", "در", "به", "که", "از")
 
 
-
-    # try:
-    #     case_folding.index(term)
-    #     termm = case_folding[1]
-    #     print(termm + "asdfasdfasdf")
-    # except:
-    #     termm = term
-    #     print(termm + "heeee")
+# try:
+#     case_folding.index(term)
+#     termm = case_folding[1]
+#     print(termm + "asdfasdfasdf")
+# except:
+#     termm = term
+#     print(termm + "heeee")
 
 
 class Indexer:
