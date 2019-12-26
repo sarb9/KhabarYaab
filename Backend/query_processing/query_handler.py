@@ -24,7 +24,6 @@ class QueryHandler:
 
     def ask(self, query):
         query_phrases = self.extract_query_parts(query)
-        print(query_phrases, "    query phrasesssssss")
 
         ans = set(i for i in range(news_model.NewsModel.gid))
         for qp in query_phrases:
