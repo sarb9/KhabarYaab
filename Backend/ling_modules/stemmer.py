@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 
-import hazm
 from PersianStemmer import PersianStemmer
 
 
@@ -10,10 +9,10 @@ class Stemmer:
         self.stemmer = PersianStemmer()
 
     def stem(self, text):
-        return self.stemmer.stem(text)
+        return self.stemmer.run(text)
 
     def __call__(self, text):
         if isinstance(text, list):
-            return [self.stemmer.stem(t) for t in text]
+            return [self.stemmer.run(t) for t in text]
         else:
-            return self.stemmer.stem(text)
+            return self.stemmer.run(text)
