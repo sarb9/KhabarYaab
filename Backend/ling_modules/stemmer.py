@@ -1,7 +1,5 @@
 import pickle
 import re
-from ling_modules.pipline import Pipeline
-
 
 class Stemmer:
 
