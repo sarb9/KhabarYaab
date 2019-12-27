@@ -12,7 +12,7 @@ class Stemmer:
             return self.stem(text)
 
     def stem(self, term):
-        other_prefix = ["(.*)(ی)", "(.*)(ای)", "(.*)(ان)", "(.*)(ها)"]
+        other_suffix = ["(.*)(ی$)", "(.*)(ای$)", "(.*)(ان$)", "(.*)(ها$)"]
         verb_stems = load_stem_pickle()
         irregular_nouns = load_irregular_noun()
 
@@ -21,8 +21,8 @@ class Stemmer:
                                 "(.*)(گار)"]  # we want to keep them
             for legal_affix in legal_verb_affix:
                 if re.search(legal_affix, term):
-                    for prefix in other_prefix:
-                        term = re.sub(pattern=prefix, repl=r"\1", string=term)  # remove other_prefix from word
+                    for suffix in other_suffix:
+                        term = re.sub(pattern=suffix, repl=r"\1", string=term)  # remove other_suffix from word
                     return True, term
 
             for verb in verb_stems:
@@ -42,21 +42,21 @@ class Stemmer:
                     return raw[1]
 
             suffix = ["كار", "ناك", "وار", "آسا", "آگین", "بار", "بان", "دان", "زار", "سار", "سان", "لاخ", "مند", "دار",
-                      "مرد", "کننده", "گرا", "وش", "نما", "متر"]
+                      "مرد", "کننده", "گرا", "وش", "نما"]
             prefix = ["بی", "با", "پیش", "غیر", "فرو", "هم", "نا", "یک"]
 
-            suffix_regex = []
+            noun_suffix_regex = []
             for suf in suffix:  # Create regex format from list
-                suffix_regex.append("(.*)(" + suf + ")")
+                noun_suffix_regex.append("(.*)(" + suf + ")")
 
-            for suf in suffix_regex:
+            for suf in (other_suffix + noun_suffix_regex):
                 term = re.sub(pattern=suf, repl=r"\1", string=term)
 
-            prefix_regex = []
+            noun_prefix_regex = []
             for pre in prefix:  # Create regex format from list
-                prefix_regex.append("(" + pre + ")(.*)")
+                noun_prefix_regex.append("(" + pre + ")(.*)")
 
-            for pre in prefix_regex:
+            for pre in noun_prefix_regex:
                 term = re.sub(pattern=pre, repl=r"\2", string=term)
 
             return term
