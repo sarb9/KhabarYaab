@@ -80,7 +80,7 @@ class Stemmer:
             term = check_noun_stem(term)
 
         print("Term : " + term)
-        return term
+        return term.strip("\u200c")
 
 
 def load_stem_pickle():
