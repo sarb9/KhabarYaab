@@ -1,21 +1,5 @@
 import pickle
 import re
-from ling_modules.pipline import Pipeline
-
-# CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"], ["بلیت", "بلیط"])
-CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"],
-                ["بلیت", "بلیط"], ["طوفان", "توفان"])
-
-
-# CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"])
-
-
-def add_similars(phrase):
-    for case in CASE_FOLDING:
-        if phrase in case:
-            return case
-    return []
-
 
 class Stemmer:
 
