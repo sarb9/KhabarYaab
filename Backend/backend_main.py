@@ -1,3 +1,5 @@
+import re
+
 from utils import import_utils
 from models import news_model
 from indexer import nindexer
@@ -45,12 +47,19 @@ def highlight_phrases_in_content(content, query_phrases):
                     return i
 
     def get_upper_bound(index):
+        upper_index = 0
         if index + threshold > len(highlighted_content):
             return len(highlighted_content)
         else:
             for i in range(index + threshold, 0, -1):
                 if highlighted_content[i] == " ":
-                    return i
+                    upper_index = i
+                    break
+        findex = highlighted_content[index: upper_index].find("<b")
+        if findex == -1:
+            return upper_index
+        else:
+            return index + findex
 
     def bold_phrases(highlighted_content):
         phrases = []
@@ -69,20 +78,27 @@ def highlight_phrases_in_content(content, query_phrases):
                 #     phrases.append(case_folded)
 
         for phrase in phrases:
-            highlighted_content = highlighted_content.replace(phrase, "<b style='color:red'>" + phrase + "</b>")
+            # highlighted_content = highlighted_content.replace(phrase, "<b style='color:red'>" + phrase + "</b>")
+            highlighted_content = re.sub(r"\s[\u200c]?" + phrase,
+                                         " <b style='color:red'>" + " " + phrase + " " + "</b> ",
+                                         highlighted_content)
+
         return highlighted_content, phrases
 
     highlighted_content, phrases = bold_phrases(highlighted_content)
 
     threshold = 80 - 7 * len(phrases)
-    if threshold < 20:
-        threshold = 20
+    if threshold < 23:
+        threshold = 23
 
     list_of_index = []
     for phrase in phrases:
-        index = highlighted_content.find(phrase)
-        if index != -1:
-            list_of_index.append(index)
+        # index = highlighted_content.find(phrase)
+        index = re.search(r"\s[/u200c]?" + phrase, highlighted_content)
+        if index is not None:
+            list_of_index.append(index.start())
+        # if index != -1:
+        #     list_of_index.append(index)
 
     list_of_index.sort()
     upper_index = 0
