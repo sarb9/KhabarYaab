@@ -88,8 +88,8 @@ def highlight_phrases_in_content(content, query_phrases):
     highlighted_content, phrases = bold_phrases(highlighted_content)
 
     threshold = 80 - 7 * len(phrases)
-    if threshold < 23:
-        threshold = 23
+    if threshold < 22:
+        threshold = 22
 
     list_of_index = []
     for phrase in phrases:
