@@ -1,4 +1,5 @@
 from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
+import matplotlib.pyplot as plt
 from models.news_model import NewsModel
 import pickle
 import os.path
@@ -39,14 +40,28 @@ class Indexer:
         if not force and os.path.exists('data/dictionary_obj.pkl'):
             return
 
+        # heaps law
+        seen_words = set()
+        heaps_law = []
+
         for model in models:
             tokens = self.pipline.feed(model.content)
+
+            seen_words |= set(tokens)
+            heaps_law.append(len(seen_words))
+
             doc = Document(tokens)
             self.dct.add_doc(doc)
 
             for i, term in enumerate(tokens):
                 # termm = check_case_folding(term)
                 self.index.append(Occurance(term, Posting(model.id, i)))
+
+        fig = plt.figure()
+        plt.plot(range(len(models)), heaps_law)
+        fig.savefig('temp.png', dpi=fig.dpi)
+
+        print("____+_+_+_+_+_+___________")
 
     def create_dictionary(self, from_scratch=False):
 
@@ -86,6 +101,15 @@ class Indexer:
         self.dct[prev] = poslist
 
         self.dct.calc_tf_idf()
+
+        # zips law
+        print("ZIPFS:")
+        word_freqs = {word: len(poss) for word, poss in self.dct.data.items()}
+        word_freqs = {k: v for k, v in sorted(
+            word_freqs.items(), key=lambda item: item[1])}
+        for i, j in word_freqs.items():
+            if j > 1000:
+                print(i, j)
 
         for stop_word in STOP_WORDS:
             del self.dct[stop_word]
