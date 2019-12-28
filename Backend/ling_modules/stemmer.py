@@ -3,7 +3,8 @@ from collections.abc import Iterable
 from PersianStemmer import PersianStemmer
 
 # CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"], ["بلیت", "بلیط"])
-CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"], ["بلیت", "بلیط"], ["طوفان", "توفان"])
+CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"],
+                ["بلیت", "بلیط"], ["طوفان", "توفان"])
 
 
 # CASE_FOLDING = (["تهران", "طهران"], ["زغال", "ذغال"])
@@ -34,9 +35,6 @@ class Stemmer:
 
     def __call__(self, text):
         if isinstance(text, list):
-
-            # print("hereeeeeeeeeeeee")
             return [self.stemmer.stem(self.check_case_folding(t)) for t in text]
         else:
-            # print("oonjaii ke nabaud")
             return self.stemmer.stem(text)
