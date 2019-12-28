@@ -1,3 +1,6 @@
+from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
+import matplotlib.pyplot as plt
+from models.news_model import NewsModel
 import pickle
 import os.path
 from collections import namedtuple
