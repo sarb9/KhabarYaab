@@ -1,15 +1,8 @@
-from hazm import word_tokenize, sent_tokenize
 import re
 from ling_modules.pipline import Pipeline
 
 
 class Tokenizer:
-
-    def word_tokenize(self, text):
-        return word_tokenize(text)
-
-    def sent_tokenize(self, text):
-        return sent_tokenize(text)
 
     def tokenize(self, text):
         def remove_punctuations(text):
@@ -22,10 +15,58 @@ class Tokenizer:
             """
             extract tokens from text into a list
             """
-            return text.split()
+            if " " in text:
+                return text.split()
+            else:
+                return text
 
-        tokenization_pipeline = Pipeline(remove_punctuations, split_by_space)
+        def check_fp(text):
+            """
+            check for frequent patterns and uniform them
+            """
+            frequent_patterns = load_from_file(load_path="resources/frequent_patterns")
+            for row in frequent_patterns:
+                if text.find(row) != -1:
+                    text = text.replace(row, space_to_zwnj(row))
+
+            return text
+
+        def check_cf(text):
+            """
+            check for case folding
+            """
+            case_foldings = load_from_file(load_path="resources/case_foldings", delimiter=",")
+            for foldings in case_foldings:
+                if text.find(foldings[1]) != -1:
+                    text = text.replace(foldings[1], foldings[0])
+
+            return text
+
+        tokenization_pipeline = Pipeline(remove_punctuations, check_fp, check_cf, split_by_space)
         return tokenization_pipeline.feed(text=text)
 
     def __call__(self, text):
-        return word_tokenize(text)
+        return self.tokenize(text)
+
+
+def load_from_file(load_path, delimiter="nothing"):
+    """
+    load irregular nouns from .txt file
+    """
+    with open(load_path, "r") as file:
+        nouns = []
+        if delimiter == "nothing":
+            for line in file:
+                nouns.append(line.strip())
+            return nouns
+
+        for line in file:
+            nouns.append(line.strip().split(delimiter))
+    return nouns
+
+
+def space_to_zwnj(text):
+    """
+    convert space to \u200c character
+    """
+    return re.sub(r'[\s]', '\u200c', text)

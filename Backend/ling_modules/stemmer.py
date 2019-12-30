@@ -1,5 +1,7 @@
 import pickle
 import re
+from .tokenizer import load_from_file
+
 
 class Stemmer:
 
@@ -12,11 +14,11 @@ class Stemmer:
     def stem(self, term):
         other_suffix = ["(.*)(ی$)", "(.*)(ای$)", "(.*)(ان$)", "(.*)(ها$)"]
         verb_stems = load_stem_pickle()
-        irregular_nouns = load_irregular_noun()
+        irregular_nouns = load_from_file(load_path="ling_modules/resources/irregular_nouns", delimiter="\t")
 
         def check_verb_stem(term):
             legal_verb_affix = ["(وا)(.*)", "(اثر)(.*)", "(فرو)(.*)", "(پیش)(.*)", "(گرو)(.*)",
-                                "(.*)(گار)"]  # we want to keep them
+                                "(.*)(گار)", "(.*)(چه)"]  # we want to keep them
             for legal_affix in legal_verb_affix:
                 if re.search(legal_affix, term):
                     for suffix in other_suffix:
@@ -76,15 +78,3 @@ def load_stem_pickle():
     stems = pickle.load(file)
     file.close()
     return stems
-
-
-def load_irregular_noun():
-    """
-    load irregular nouns from .txt file
-    """
-    load_path = "ling_modules/resources/irregular_nouns"
-    with open(load_path, "r") as file:
-        nouns = []
-        for line in file:
-            nouns.append(line.strip().split("\t"))
-    return nouns
