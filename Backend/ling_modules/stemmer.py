@@ -65,7 +65,7 @@ class Stemmer:
         if not is_verb:
             term = check_noun_stem(term)
 
-        print("Term : " + term)
+        # print("Term : " + term)
         return term.strip("\u200c")
 
 

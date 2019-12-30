@@ -24,7 +24,7 @@ class Tokenizer:
             """
             check for frequent patterns and uniform them
             """
-            frequent_patterns = load_from_file(load_path="resources/frequent_patterns")
+            frequent_patterns = load_from_file(load_path="ling_modules/resources/frequent_patterns")
             for row in frequent_patterns:
                 if text.find(row) != -1:
                     text = text.replace(row, space_to_zwnj(row))
@@ -35,7 +35,7 @@ class Tokenizer:
             """
             check for case folding
             """
-            case_foldings = load_from_file(load_path="resources/case_foldings", delimiter=",")
+            case_foldings = load_from_file(load_path="ling_modules/resources/case_foldings", delimiter=",")
             for foldings in case_foldings:
                 if text.find(foldings[1]) != -1:
                     text = text.replace(foldings[1], foldings[0])
