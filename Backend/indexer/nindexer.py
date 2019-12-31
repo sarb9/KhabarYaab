@@ -72,7 +72,8 @@ class Indexer:
         dct[prev] = poslist
 
         for stop_word in STOP_WORDS:
-            del dct[stop_word]
+            if stop_word in dct:
+                del dct[stop_word]
 
         save_dictionary(dct)
         return dct

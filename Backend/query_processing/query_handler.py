@@ -89,6 +89,7 @@ class QueryHandler:
         return docs
 
     def extract_query_parts(self, query, without_pipeline=False):
+        # Todo : query and pipeline
         query = query.strip()
 
         parts = re.findall(r'!?\".*?\"', query)
@@ -101,7 +102,7 @@ class QueryHandler:
         query_parts[:] = [
             token for token in query_parts if token not in nindexer.STOP_WORDS]
         parts += [QueryPhrase(True, (part,)) if part[0] != '!'
-                  else QueryPhrase(False, (part[1:], )) for part in query_parts if len(part) > 0]
+                  else QueryPhrase(False, (part[1:],)) for part in query_parts if len(part) > 0]
         if not without_pipeline:
             parts[:] = [QueryPhrase(part.b, [self.pipline.feed(term)
                                              for term in part.terms]) for part in parts]
