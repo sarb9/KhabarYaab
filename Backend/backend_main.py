@@ -3,7 +3,7 @@ import re
 from utils import import_utils
 from models import news_model
 from indexer import nindexer
-from query_handler import QueryHandler, QueryPhrase
+from query_processing.query_handler import QueryHandler, QueryPhrase
 from Server import app
 # from indexer.nindexer import check_case_folding
 from ling_modules.stemmer import add_similars

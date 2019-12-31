@@ -107,8 +107,8 @@ class Indexer:
 
         # delete stop words after zipfs law
         for stop_word in STOP_WORDS:
-            if stop_word in dct:
-                del dct[stop_word]
+            if stop_word in self.dct:
+                del self.dct[stop_word]
 
         # save and return at the end
         save_dictionary(self.dct)
