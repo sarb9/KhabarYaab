@@ -69,7 +69,7 @@ class QueryHandler:
                     score += doc[term] * term_freq
 
             answers[doc_id] = score / \
-                              (self.calc_length(doc) * self.calc_length(vector))
+                (self.calc_length(doc) * self.calc_length(vector))
 
         return self.get_best_k_news(answers)
 

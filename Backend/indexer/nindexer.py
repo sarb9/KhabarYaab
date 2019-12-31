@@ -1,6 +1,3 @@
-from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
-import matplotlib.pyplot as plt
-from models.news_model import NewsModel
 import pickle
 import os.path
 from collections import namedtuple
@@ -20,15 +17,6 @@ STOP_WORDS = ("چه", "اگر", "همه", "نه", "آنها",
               "باید", "هر", "او", "ما", "من", "تا",
               "نیز", "اما", "یک", "خود", "بر",
               "یا", "هم", "را", "این", "با", "آن", "برای", "و", "در", "به", "که", "از")
-
-
-# try:
-#     case_folding.index(term)
-#     termm = case_folding[1]
-#     print(termm + "asdfasdfasdf")
-# except:
-#     termm = term
-#     print(termm + "heeee")
 
 
 class Indexer:
