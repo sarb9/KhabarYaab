@@ -86,10 +86,6 @@ def highlight_phrases_in_content(content, query_phrases):
                                          " <b style='color:red'>" + " " + phrase + " " + "</b> ",
                                          highlighted_content)
 
-        # =======
-        #             highlighted_content = highlighted_content.replace(
-        #                 phrase, "<b style='color:red'>" + phrase + "</b>")
-        # >>>>>>> 3c6e4553034ff0f2c0c1a54a8122201e271ac44a
         return highlighted_content, phrases
 
     highlighted_content, phrases = bold_phrases(highlighted_content)
