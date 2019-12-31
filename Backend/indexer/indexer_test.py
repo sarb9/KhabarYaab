@@ -16,15 +16,10 @@ def models():
 
 def test_index(models):
     ind = nindexer.Indexer()
-    ind.feed(models)
-    dct = ind.create_dictionary()
+    ind.feed(models, force=True)
+    dct = ind.create_dictionary(force=True)
 
 
 def test_term_frequency(models):
     ind = nindexer.Indexer()
     ind.feed(models)
-    print("==============================")
-    print(ind.dct.docs[0].terms)
-    print("==============================")
-    print(ind.dct.docs[1].terms)
-    print("==============================")

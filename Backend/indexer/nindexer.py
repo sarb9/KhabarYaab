@@ -1,10 +1,11 @@
-from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
-import matplotlib.pyplot as plt
-from models.news_model import NewsModel
 import pickle
 import os.path
-from dictionary.posting import Posting
 from collections import namedtuple
+
+import matplotlib.pyplot as plt
+
+from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
+from models.news_model import NewsModel
 from dictionary import dictionary, posting
 from dictionary.document import Document
 
@@ -16,15 +17,6 @@ STOP_WORDS = ("چه", "اگر", "همه", "نه", "آنها",
               "باید", "هر", "او", "ما", "من", "تا",
               "نیز", "اما", "یک", "خود", "بر",
               "یا", "هم", "را", "این", "با", "آن", "برای", "و", "در", "به", "که", "از")
-
-
-# try:
-#     case_folding.index(term)
-#     termm = case_folding[1]
-#     print(termm + "asdfasdfasdf")
-# except:
-#     termm = term
-#     print(termm + "heeee")
 
 
 class Indexer:
@@ -54,16 +46,14 @@ class Indexer:
             self.dct.add_doc(doc)
 
             for i, term in enumerate(tokens):
-                # termm = check_case_folding(term)
-                self.index.append(Occurance(term, Posting(model.id, i)))
+                self.index.append(
+                    Occurance(term, posting.Posting(model.id, i)))
 
         fig = plt.figure()
         plt.plot(range(len(models)), heaps_law)
-        fig.savefig('temp.png', dpi=fig.dpi)
+        fig.savefig('statistics/heaps.png', dpi=fig.dpi)
 
-        print("____+_+_+_+_+_+___________")
-
-    def create_dictionary(self, from_scratch=False):
+    def create_dictionary(self, force=False):
 
         def save_dictionary(dct):
             with open('data/dictionary_obj.pkl', 'wb') as output:
@@ -73,11 +63,13 @@ class Indexer:
             with open('data/dictionary_obj.pkl', 'rb') as input_file:
                 return pickle.load(input_file)
 
-        if not from_scratch and os.path.exists('data/dictionary_obj.pkl'):
+        if not force and os.path.exists('data/dictionary_obj.pkl'):
             return load_dictionary()
 
+        # sort documents
         self.index.sort()
 
+        # calculate document frequencies
         prev = None
         prev_d = None
         poslist = posting.PostingList()
@@ -100,19 +92,23 @@ class Indexer:
         poslist.df = poslist.df
         self.dct[prev] = poslist
 
+        # calculate tf-idf
         self.dct.calc_tf_idf()
 
-        # zips law
-        print("ZIPFS:")
-        word_freqs = {word: len(poss) for word, poss in self.dct.data.items()}
-        word_freqs = {k: v for k, v in sorted(
-            word_freqs.items(), key=lambda item: item[1])}
-        for i, j in word_freqs.items():
-            if j > 1000:
-                print(i, j)
+        # zipfs law
+        word_freqs = {len(posting_list): None
+                      for word, posting_list in self.dct.data.items()}
 
+        zipfs = list(word_freqs.keys())
+        zipfs.sort(reverse=True)
+        fig = plt.figure()
+        plt.plot(range(len(zipfs)), zipfs)
+        fig.savefig('statistics/zipfs.png', dpi=fig.dpi)
+
+        # delete stop words after zipfs law
         for stop_word in STOP_WORDS:
             del self.dct[stop_word]
 
+        # save and return at the end
         save_dictionary(self.dct)
         return self.dct

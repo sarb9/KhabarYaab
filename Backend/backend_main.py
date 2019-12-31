@@ -24,7 +24,8 @@ def get_news_headers(query):
     results = []
     for doc_id in ans:
         news_model_view = mdls[doc_id]
-        selected_part = highlight_phrases_in_content(news_model_view.content, query_phrases)
+        selected_part = highlight_phrases_in_content(
+            news_model_view.content, query_phrases)
         results.append(
             {"selected_parts": selected_part, "id": news_model_view.id, "thumbnail": news_model_view.thumbnail,
              "title": news_model_view.title, "publish_date": news_model_view.publish_date})
@@ -69,7 +70,8 @@ def highlight_phrases_in_content(content, query_phrases):
                 #     phrases.append(case_folded)
 
         for phrase in phrases:
-            highlighted_content = highlighted_content.replace(phrase, "<b style='color:red'>" + phrase + "</b>")
+            highlighted_content = highlighted_content.replace(
+                phrase, "<b style='color:red'>" + phrase + "</b>")
         return highlighted_content, phrases
 
     highlighted_content, phrases = bold_phrases(highlighted_content)

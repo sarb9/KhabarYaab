@@ -4,3 +4,8 @@ env
 Frontend/node_modules
 .Ds_store
 data/dictionary_obj.pkl
+__pycache__
+.pytest_cache
+dictionary_obj.pkl
+heaps.png
+zipfs.png
