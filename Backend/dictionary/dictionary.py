@@ -2,10 +2,16 @@ from collections import UserDict
 from math import log
 from array import array
 
+# from backend_main import SCORING_MODE
+
+SCORING_MODE = 1
+
 
 class Dictionary(UserDict):
-
-    docs = []
+    def __init__(self):
+        super().__init__()
+        self.docs = []
+    # docs = []
 
     def calc_tf_idf(self):
         keys = self.data.keys()
@@ -15,8 +21,15 @@ class Dictionary(UserDict):
         for i, doc in enumerate(self.docs):
             vector = {}
             for term, tf in doc.terms.items():
-                vector[term] = (1 + log(tf)) * \
-                    log(n_docs / self.data[term].df)
+                if SCORING_MODE == 1:
+                    vector[term] = tf * log(n_docs / self.data[term].df)
+
+                elif SCORING_MODE == 2:
+                    vector[term] = (1 + log(tf))
+
+                elif SCORING_MODE == 3:
+                    vector[term] = (1 + log(tf)) * \
+                                   log(n_docs / self.data[term].df)
 
             doc.set_vector(vector)
 
@@ -25,8 +38,8 @@ class Dictionary(UserDict):
 
     def __missing__(self, key):
         if isinstance(key, str):
-            raise(Exception("MISS: ##############################" +
-                            key + "##############################"))
+            raise (Exception("MISS: ##############################" +
+                             key + "##############################"))
         else:
             return self.data[str(key)]
 

@@ -6,6 +6,9 @@ from indexer import nindexer
 from math import log, sqrt
 import re
 import heapq
+from dictionary.dictionary import SCORING_MODE
+
+# from backend_main import SCORING_MODE
 
 # from indexer.nindexer import check_case_folding
 best_k = 30
@@ -45,8 +48,18 @@ class QueryHandler:
                     else:
                         vector[term] = 1
 
+        max_tf = max(vector.values())
         for term, term_freq in vector.items():
-            vector[term] = 1 + log(term_freq)
+            if SCORING_MODE == 1:
+                vector[term] = (0.5 + 0.5 * term_freq / max_tf) * log(len(self.dct.docs) / self.dct[term].df)
+
+            elif SCORING_MODE == 2:
+                vector[term] = log(1 + len(self.dct.docs) / self.dct[term].df)
+            elif SCORING_MODE == 3:
+                print("000000000000", len(self.dct.docs) , len(self.dct.docs) / self.dct[term].df)
+                vector[term] = (1 + log(term_freq)) * log(len(self.dct.docs) / self.dct[term].df)
+
+            # vector[term] = 1 + log(term_freq)
 
         answers = {}
         for doc_id in ans:
@@ -55,15 +68,10 @@ class QueryHandler:
             for term, term_freq in vector.items():
                 if term in doc:
                     score += doc[term] * term_freq
+
             answers[doc_id] = score / \
                               (self.calc_length(doc) * self.calc_length(vector))
 
-        print("*******************************8")
-        for doc_id, score in answers.items():
-            print(doc_id, score)
-        print("*******************************8")
-
-        # return [k for k, v in sorted(answers.items(), key=lambda item: item[1])]
         return self.get_best_k_news(answers)
 
     def calc_length(self, vector):
@@ -77,7 +85,6 @@ class QueryHandler:
         heap = [(-value, key) for key, value in ans_dct.items()]
         largest = heapq.nsmallest(k, heap)
         largest = [(key, -value) for value, key in largest]
-        print("lahrgesttt::       ", largest)
         return [k[0] for k in largest]
 
     def retrive(self, qp):
