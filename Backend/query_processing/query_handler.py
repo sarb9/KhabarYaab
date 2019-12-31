@@ -132,6 +132,7 @@ class QueryHandler:
         return docs
 
     def extract_query_parts(self, query, without_pipeline=False):
+        # Todo : query and pipeline
         query = query.strip()
 
         parts = re.findall(r'!?\".*?\"', query)
