@@ -57,6 +57,10 @@ class Normalizer:
 
     def __call__(self, text):
         if isinstance(text, list):
+<<<<<<< HEAD
             return [self.normalize(t) for t in text]
+=======
+            return [self.normalizer.normalize(t) for t in text]
+>>>>>>> refactoring
         else:
             return self.normalize(text)
