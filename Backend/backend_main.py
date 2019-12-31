@@ -125,7 +125,7 @@ def highlight_phrases_in_content(content, query_phrases):
 
 
 print("reading from corpus...")
-corpus = import_utils.load_corpus()
+corpus = import_utils.load_corpus(flag="csv")
 
 print("indexing...")
 mdls = news_model.create_models_list_from_news(corpus)
