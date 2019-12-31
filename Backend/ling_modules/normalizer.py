@@ -1,8 +1,8 @@
-
 import hazm
 
 
 class Normalizer:
+
     def __init__(self):
         self.normalizer = hazm.Normalizer()
 

@@ -3,6 +3,8 @@ from models import news_model
 from indexer import nindexer
 from query_handler import QueryHandler, QueryPhrase
 from Server import app
+# from indexer.nindexer import check_case_folding
+from ling_modules.stemmer import add_similars
 import copy
 
 
@@ -22,7 +24,8 @@ def get_news_headers(query):
     results = []
     for doc_id in ans:
         news_model_view = mdls[doc_id]
-        selected_part = highlight_phrases_in_content(news_model_view.content, query_phrases)
+        selected_part = highlight_phrases_in_content(
+            news_model_view.content, query_phrases)
         results.append(
             {"selected_parts": selected_part, "id": news_model_view.id, "thumbnail": news_model_view.thumbnail,
              "title": news_model_view.title, "publish_date": news_model_view.publish_date})
@@ -43,8 +46,8 @@ def highlight_phrases_in_content(content, query_phrases):
                     return i
 
     def get_upper_bound(index):
-        if index + threshold > len(content):
-            return len(content)
+        if index + threshold > len(highlighted_content):
+            return len(highlighted_content)
         else:
             for i in range(index + threshold, 0, -1):
                 if highlighted_content[i] == " ":
@@ -57,19 +60,32 @@ def highlight_phrases_in_content(content, query_phrases):
                 integrated_term = ""
                 for term in qp.terms:
                     integrated_term += term + " "
-                phrases.append(integrated_term.strip())
+                integrated_term = integrated_term.strip()
+                phrases.append(integrated_term)
+                for s_term in add_similars(integrated_term):
+                    if integrated_term != s_term:
+                        phrases.append(s_term)
+                # case_folded = check_case_folding(integrated_term)
+                # if case_folded != integrated_term:
+                #     phrases.append(case_folded)
+
         for phrase in phrases:
-            highlighted_content = highlighted_content.replace(phrase, "<b>" + phrase + "</b>")
+            highlighted_content = highlighted_content.replace(
+                phrase, "<b style='color:red'>" + phrase + "</b>")
         return highlighted_content, phrases
 
     highlighted_content, phrases = bold_phrases(highlighted_content)
-    threshold = 80 - 6 * len(phrases)
+
+    threshold = 80 - 7 * len(phrases)
     if threshold < 20:
         threshold = 20
 
     list_of_index = []
     for phrase in phrases:
-        list_of_index.append(highlighted_content.find(phrase))
+        index = highlighted_content.find(phrase)
+        if index != -1:
+            list_of_index.append(index)
+
     list_of_index.sort()
     upper_index = 0
     lower_index = 0

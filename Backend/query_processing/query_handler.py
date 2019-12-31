@@ -3,8 +3,12 @@ from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
 from dictionary.posting import Posting
 from models import news_model
 from indexer import nindexer
+from math import log, sqrt
 import re
+import heapq
 
+# from indexer.nindexer import check_case_folding
+best_k = 30
 QueryPhrase = namedtuple('QueryPhrase', ['b', 'terms'])
 
 
@@ -17,31 +21,60 @@ class QueryHandler:
 
     def ask(self, query):
         query_phrases = self.extract_query_parts(query)
-        # print(query_phrases, " ()))() query phrases")
+        print(query_phrases, "    query phrasesssssss")
 
         ans = set(i for i in range(news_model.NewsModel.gid))
         for qp in query_phrases:
             docs = self.retrive(qp)
-            print(docs)
             if qp.b:
                 ans = ans & docs
-                print(ans)
             else:
                 ans = ans - docs
 
+        ans = self.sort_answers(ans, query_phrases)
+
         return ans
+
+    def sort_answers(self, ans, query_phrases):
+        vector = {}
+        for qp in query_phrases:
+            if qp.b:
+                for term in qp.terms:
+                    if term in vector:
+                        vector[term] += 1
+                    else:
+                        vector[term] = 1
+
+        for term, term_freq in vector.items():
+            vector[term] = 1 + log(term_freq)
+
+        answers = {}
+        for doc_id in ans:
+            score = 0
+            doc = self.dct.docs[doc_id].vector
+            for term, term_freq in vector.items():
+                if term in doc:
+                    score += doc[term] * term_freq
+            answers[doc_id] = score / \
+                (self.calc_length(doc) * self.calc_length(vector))
+
+        return self.get_best_k_news(answers)
+
+    def calc_length(self, vector):
+        s = 0
+        for tfidf in vector.values():
+            s += tfidf ** 2
+        return sqrt(s)
+
+    def get_best_k_news(self, ans_dct):
+        k = min(best_k, len(ans_dct))
+        heap = [(-value, key) for key, value in ans_dct.items()]
+        largest = heapq.nsmallest(k, heap)
+        largest = [(key, -value) for value, key in largest]
+        return [k[0] for k in largest]
 
     def retrive(self, qp):
         docs = set()
-        # print("----------------------------------------------------------------------")
-        # print(qp)
-
-        # for term in qp.terms:
-        ##print(term, ": ---------------------------------------------------------")
-        # print(self.dct[term])
-        # print()
-        # print()
-        # print("************************************************************")
 
         pointer = {term: 0 for term in qp.terms}
 
@@ -60,11 +93,9 @@ class QueryHandler:
 
         pos0 = get_post(qp.terms[0])
         while pos0:
-            ##print("-------->", pos0)
 
             flag = True
             target = Posting(*pos0)
-            # print(target)
 
             for token in qp.terms[1:]:
 
@@ -75,10 +106,8 @@ class QueryHandler:
                     token_post = inc_post(token)
 
                 if token_post and token_post == target:
-                    # print("OK")
                     continue
                 else:
-                    ##print("FALSE on", token, target)
                     flag = False
                     break
             if flag:
@@ -101,9 +130,9 @@ class QueryHandler:
         query_parts[:] = [
             token for token in query_parts if token not in nindexer.STOP_WORDS]
         parts += [QueryPhrase(True, (part,)) if part[0] != '!'
-                  else QueryPhrase(False, (part[1:], )) for part in query_parts if len(part) > 0]
+                  else QueryPhrase(False, (part[1:],)) for part in query_parts if len(part) > 0]
         if not without_pipeline:
-            parts[:] = [QueryPhrase(part.b, [self.pipline.feed(term)
+            parts[:] = [QueryPhrase(part.b, [self.pipline.feed([term])[0]
                                              for term in part.terms]) for part in parts]
 
         return parts
