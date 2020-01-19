@@ -4,8 +4,8 @@ import xlrd
 import csv
 import sys
 
-# DATA_LOC = "data/news1.xlsx"
-DATA_LOC = "data/news_14.csv"
+DATA_LOC = "data/news.xlsx"
+# DATA_LOC = "data/news_14.csv"
 
 
 def remove_tags(news_model):
@@ -22,7 +22,7 @@ def load_corpus(loc=DATA_LOC, flag="xls"):
         del news[0]  # delete headers
         return news
 
-    elif flag=="csv":
+    elif flag=="xlx":
         csv.field_size_limit(sys.maxsize)
         with open(loc) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')

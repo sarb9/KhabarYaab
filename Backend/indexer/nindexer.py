@@ -93,7 +93,9 @@ class Indexer:
         self.dct[prev] = poslist
 
         # calculate tf-idf
-        self.dct.calc_tf_idf()
+        self.dct.calc_doc_tf_idf()
+        self.dct.calc_clusters()
+        self.dct.calc_categories()
 
         # zipfs law
         word_freqs = {len(posting_list): None

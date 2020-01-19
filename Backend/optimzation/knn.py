@@ -1,0 +1,2 @@
+def knn(docs):
+    return []
