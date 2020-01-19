@@ -4,7 +4,7 @@ from array import array
 
 # from backend_main import SCORING_MODE
 
-SCORING_MODE = 1
+SCORING_MODE = 3
 
 
 class Dictionary(UserDict):
