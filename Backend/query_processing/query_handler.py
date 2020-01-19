@@ -85,6 +85,7 @@ class QueryHandler:
         heap = [(-value, key) for key, value in ans_dct.items()]
         largest = heapq.nsmallest(k, heap)
         largest = [(key, -value) for value, key in largest]
+
         return [k[0] for k in largest]
 
     def retrive(self, qp):
