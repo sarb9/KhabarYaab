@@ -87,6 +87,7 @@ def highlight_phrases_in_content(content, query_phrases):
                                          highlighted_content)
 
 
+
         return highlighted_content, phrases
 
     highlighted_content, phrases = bold_phrases(highlighted_content)

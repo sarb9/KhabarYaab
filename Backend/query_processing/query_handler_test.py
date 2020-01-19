@@ -31,7 +31,9 @@ def query_handler_fix():
 
 
 def test_query_retrieve(query_handler_fix):
+
     qp = QueryPhrase(True, ("فعال", "سیاس", "ایل"))
+
 
     ans = query_handler_fix.retrive(qp)
     assert 1835 in ans
