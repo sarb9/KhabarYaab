@@ -45,8 +45,8 @@ class Dictionary(UserDict):
     def calc_clusters(self):
         self.clusters = kmeans(self.docs_weights)
 
-    def calc_categories(self):
-        self.categories = knn(self.docs_weights)
+    def calc_categories(self, labeled_doc ,K=5):
+        self.categories = knn(labeled_doc=labeled_doc, all_docs_weights=self.docs_weights, K=K)
 
     def add_doc(self, doc):
         self.docs.append(doc)
