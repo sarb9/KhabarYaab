@@ -3,78 +3,109 @@ import random
 from .similarity import calc_similarity
 
 
-def kmeans(docs_weights, k):
-    clusters_centers = []
-    clusters_values = []
+class Centroid:
 
-    for _i in range(4):
-        if _i == 0:
-            # choose centers randomly
-            for i in range(k):
-                clusters_centers.append(random.choice(docs_weights))
-                clusters_values.append([])
-        else:
-            # calc new centers
-            new_clusters_centers = []
-            new_clusters_values = []
-            for one_cluster in clusters_values:
-                avg = {}
-                for vector in one_cluster:
-                    for term in vector:
-                        added_value = vector[term] / len(one_cluster)
-                        if term not in avg:
-                            avg[term] = added_value
-                        else:
-                            avg[term] = avg[term] + added_value
+    def __init__(self, weights):
+        self.weights = weights
 
-                new_clusters_centers.append(avg)
-                new_clusters_values.append([])
+        self.next = {}
+        self.n_docs = 0
 
-            clusters_centers = new_clusters_centers
-            clusters_values = new_clusters_values
+        self.documents = []
 
-        # assgin vectors to members
-        for vector in docs_weights:
-            max_similarity = 0
-            best_center_index = 0
-            for center_index in range(len(clusters_centers)):
-                sim = calc_similarity(clusters_centers[center_index], vector)
-                if sim > max_similarity:
-                    best_center_index = center_index
-                    max_similarity = sim
-            clusters_values[best_center_index].append(vector)
+    def similarity(self, document):
+        return calc_similarity(self.weights, document)
 
-    return clusters_centers, clusters_values
+    def add(self, document):
+        for key, value in document.items():
+            if key in self.next:
+                self.next[key] += value
+            else:
+                self.next[key] = value
+        self.n_docs += 1
+
+    def calc(self):
+        self.weights = {}
+        for key, value in self.next.items():
+            self.weights[key] = value/self.n_docs
+
+        self.n_docs = 0
+        self.next = {}
+
+    def add_document(self, document):
+        self.documents.append(document)
 
 
-def error_function(clusters_centers, clusters_values, docs_no=0):
+def kmeans(documents, k, iterations):
+    centroids = []
+
+    for i in range(k):
+        centroids.append(Centroid(random.choice(documents).terms))
+
+    def find_best_centroid(document):
+        max_similarity = 0
+        best_centroid = centroids[0]
+
+        for centroid in centroids:
+            sim = centroid.similarity(document)
+            if sim > max_similarity:
+                max_similarity = sim
+                best_centroid = centroid
+        return best_centroid
+
+    # main loop of k-means
+    for i in range(iterations):
+        print(i, "started")
+
+        for document in documents:
+            centroid = find_best_centroid(document.terms)
+            centroid.add(document.terms)
+
+        print(i, "after first")
+
+        for centroid in centroids:
+            centroid.calc()
+
+        print(i, "after second")
+
+    # assign documents to centroids
+    for document in documents:
+        find_best_centroid(document.terms).add_document(document.terms)
+
+    return centroids
+
+
+def error_function(centroids, docs_no):
     error = 0
-    for i in range(len(clusters_centers)):
-        for j in range(len(clusters_values[i])):
-            error += 1 - calc_similarity(clusters_values[i][j], clusters_centers[i])
+
+    for centroid in centroids:
+        for document in centroid.documents:
+            error += 1 - centroid.similarity(document)
+
     if docs_no == 0:
         return error
     else:
         return error / docs_no
 
-    # error += calc_similarity(member, center)
-    # return error
 
-
-def plot_k_errors(k, errors):
-    plt.plot(k, errors, "bo")
-    plt.show()
-
-
-def define_best_cluster_number(docs_weights):
+def define_best_cluster_number(documents, iterations):
     k = []
     errors = []
     for cluster_number in range(9, 13, 2):
-        cluster_centers, cluster_values = kmeans(docs_weights, cluster_number)
-        errors.append(error_function(cluster_centers, cluster_values, docs_no=len(docs_weights)))
+        print("cluster_number:", cluster_number)
+        centroids = kmeans(documents, cluster_number, iterations)
+        errors.append(error_function(centroids, docs_no=len(documents)))
         k.append(cluster_number)
+
     print("k:     ", k)
     print("errorrrr:    ", errors)
-    plot_k_errors(k, errors)
+
+    fig = plt.figure()
+    fig.suptitle('test title', fontsize=20)
+    plt.xlabel('xlabel', fontsize=18)
+    plt.ylabel('ylabel', fontsize=16)
+    plt.plot(k, errors, "bo")
+    plt.show()
+
     cluster_number = int(input("it seems thr best number of clusters is: "))
     return cluster_number

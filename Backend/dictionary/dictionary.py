@@ -17,10 +17,7 @@ class Dictionary(UserDict):
 
         self.docs_weights = []
         self.categories = []
-        self.clusters_centers = []
-        self.clusters_values = []
-
-    # docs = []
+        self.centroids = []
 
     def calc_doc_tf_idf(self):
         n_docs = len(self.docs)
@@ -40,12 +37,12 @@ class Dictionary(UserDict):
 
             doc.set_vector(vector)
             self.docs_weights.append(vector)
-            del doc.terms
-        del self.docs
+            # del doc.terms
+        # del self.docs
 
     def calc_clusters(self):
-        cluster_number = define_best_cluster_number(self.docs_weights)
-        self.clusters_centers, self.clusters_values = kmeans(self.docs_weights, k=cluster_number)
+        cluster_number = define_best_cluster_number(self.docs, 4)
+        self.centroids = kmeans(self.docs, cluster_number, 4)
 
     def calc_categories(self):
         self.categories = knn(self.docs_weights)

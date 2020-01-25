@@ -6,6 +6,8 @@ class Document:
 
     def __init__(self, tokens):
         self.terms = {}
+        self.cluster = None
+        self.category = None
         for token in tokens:
             self.add_token(token)
 
