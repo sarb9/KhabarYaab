@@ -3,6 +3,9 @@ import heapq
 
 
 def calc_similarity(vec1, vec2):
+    if len(vec1) == 0 or len(vec2) == 0:
+        return 0
+
     score = 0
     common_keys = list(set(vec1) & set(vec2))
 

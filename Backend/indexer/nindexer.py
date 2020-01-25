@@ -94,6 +94,7 @@ class Indexer:
 
         # calculate tf-idf
         self.dct.calc_doc_tf_idf()
+        print("clustering ...")
         self.dct.calc_clusters()
         self.dct.calc_categories()
 
