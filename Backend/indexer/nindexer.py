@@ -92,7 +92,7 @@ class Indexer:
         poslist.df = poslist.df
         self.dct[prev] = poslist
 
-        # calculate tf-idf
+        # calculate tf-idf then cluster and categorize documents
         self.dct.calc_doc_tf_idf()
         print("clustering ...")
         self.dct.calc_clusters()
