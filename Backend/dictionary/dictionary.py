@@ -1,6 +1,8 @@
 from collections import UserDict
 from math import log
 from array import array
+from optimzation.kmeans import kmeans, define_best_cluster_number
+from optimzation.knn import knn
 
 # from backend_main import SCORING_MODE
 
@@ -10,15 +12,20 @@ SCORING_MODE = 3
 class Dictionary(UserDict):
     def __init__(self):
         super().__init__()
+        # this will be vanished..
         self.docs = []
+
+        self.docs_weights = []
+        self.categories = []
+        self.clusters_centers = []
+        self.clusters_values = []
+
     # docs = []
 
-    def calc_tf_idf(self):
-        keys = self.data.keys()
-        keys = list(keys)
+    def calc_doc_tf_idf(self):
         n_docs = len(self.docs)
 
-        for i, doc in enumerate(self.docs):
+        for doc in self.docs:
             vector = {}
             for term, tf in doc.terms.items():
                 if SCORING_MODE == 1:
@@ -32,6 +39,16 @@ class Dictionary(UserDict):
                                    log(n_docs / self.data[term].df)
 
             doc.set_vector(vector)
+            self.docs_weights.append(vector)
+            del doc.terms
+        del self.docs
+
+    def calc_clusters(self):
+        cluster_number = define_best_cluster_number(self.docs_weights)
+        self.clusters_centers, self.clusters_values = kmeans(self.docs_weights, k=cluster_number)
+
+    def calc_categories(self):
+        self.categories = knn(self.docs_weights)
 
     def add_doc(self, doc):
         self.docs.append(doc)

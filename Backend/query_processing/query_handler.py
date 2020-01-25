@@ -3,15 +3,14 @@ from ling_modules import lemmatizer, normalizer, pipline, stemmer, tokenizer
 from dictionary.posting import Posting
 from models import news_model
 from indexer import nindexer
-from math import log, sqrt
 import re
-import heapq
 from dictionary.dictionary import SCORING_MODE
+from math import log
+from optimzation.similarity import calc_similarity, pop_best_k
 
 # from backend_main import SCORING_MODE
 
 # from indexer.nindexer import check_case_folding
-best_k = 30
 QueryPhrase = namedtuple('QueryPhrase', ['b', 'terms'])
 
 
@@ -37,55 +36,37 @@ class QueryHandler:
 
         return ans
 
-    def sort_answers(self, ans, query_phrases):
-        vector = {}
+    def weight_query(self, query_phrases):
+        query_vector = {}
         for qp in query_phrases:
             if qp.b:
                 for term in qp.terms:
-                    if term in vector:
-                        vector[term] += 1
+                    if term in query_vector:
+                        query_vector[term] += 1
                     else:
-                        vector[term] = 1
+                        query_vector[term] = 1
 
-        max_tf = max(vector.values())
-        for term, term_freq in vector.items():
+        max_tf = max(query_vector.values())
+        for term, term_freq in query_vector.items():
             if SCORING_MODE == 1:
-                vector[term] = (0.5 + 0.5 * term_freq / max_tf) * log(len(self.dct.docs) / self.dct[term].df)
+                query_vector[term] = (0.5 + 0.5 * term_freq / max_tf) * log(len(self.dct.docs_weights) / self.dct[term].df)
 
             elif SCORING_MODE == 2:
-                vector[term] = log(1 + len(self.dct.docs) / self.dct[term].df)
+                query_vector[term] = log(1 + len(self.dct.docs_weights) / self.dct[term].df)
             elif SCORING_MODE == 3:
-                print("000000000000", len(self.dct.docs), len(self.dct.docs) / self.dct[term].df)
-                vector[term] = (1 + log(term_freq)) * log(len(self.dct.docs) / self.dct[term].df)
+                print("000000000000", len(self.dct.docs_weights), len(self.dct.docs_weights) / self.dct[term].df)
+                query_vector[term] = (1 + log(term_freq)) * log(len(self.dct.docs_weights) / self.dct[term].df)
+        return query_vector
 
-            # vector[term] = 1 + log(term_freq)
+    def sort_answers(self, ans, query_phrases):
+        query_vector = self.weight_query(query_phrases)
 
-        answers = {}
+        similarities = {}
         for doc_id in ans:
-            score = 0
-            doc = self.dct.docs[doc_id].vector
-            for term, term_freq in vector.items():
-                if term in doc:
-                    score += doc[term] * term_freq
+            doc_vector = self.dct.docs_weights[doc_id]
+            similarities[doc_id] = calc_similarity(doc_vector, query_vector)
 
-            answers[doc_id] = score / \
-                (self.calc_length(doc) * self.calc_length(vector))
-
-        return self.get_best_k_news(answers)
-
-    def calc_length(self, vector):
-        s = 0
-        for tfidf in vector.values():
-            s += tfidf ** 2
-        return sqrt(s)
-
-    def get_best_k_news(self, ans_dct):
-        k = min(best_k, len(ans_dct))
-        heap = [(-value, key) for key, value in ans_dct.items()]
-        largest = heapq.nsmallest(k, heap)
-        largest = [(key, -value) for value, key in largest]
-
-        return [k[0] for k in largest]
+        return pop_best_k(similarities, 30)
 
     def retrive(self, qp):
         docs = set()
