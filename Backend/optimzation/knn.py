@@ -1,7 +1,7 @@
 from optimzation.similarity import calc_similarity, pop_best_k
 
 
-def knn(labeled_docs, all_docs_weights, K):
+def knn(labeled_docs, docs, K):
     """
     label whole dataset based on limited labeled docs
     :param labeled_docs: limited labeled documents, list of tuples : [(docID, Label), ...]
@@ -10,7 +10,7 @@ def knn(labeled_docs, all_docs_weights, K):
     """
 
     categories = []
-    for i in range(len(all_docs_weights)):
+    for i in range(len(docs)):
         dist_matrix = {}
         already_labeled = False  # to prevent calculating the already labeled docs
         for labeled_doc in labeled_docs:
