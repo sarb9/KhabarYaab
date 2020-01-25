@@ -1,7 +1,7 @@
 from collections import UserDict
 from math import log
 from array import array
-from optimzation.kmeans import kmeans
+from optimzation.kmeans import kmeans, define_best_cluster_number
 from optimzation.knn import knn
 
 # from backend_main import SCORING_MODE
@@ -17,7 +17,8 @@ class Dictionary(UserDict):
 
         self.docs_weights = []
         self.categories = []
-        self.clusters = {}
+        self.clusters_centers = []
+        self.clusters_values = []
 
     # docs = []
 
@@ -43,7 +44,8 @@ class Dictionary(UserDict):
         del self.docs
 
     def calc_clusters(self):
-        self.clusters = kmeans(self.docs_weights)
+        cluster_number = define_best_cluster_number(self.docs_weights)
+        self.clusters_centers, self.clusters_values = kmeans(self.docs_weights, k=cluster_number)
 
     def calc_categories(self, labeled_doc ,K=5):
         self.categories = knn(labeled_doc=labeled_doc, all_docs_weights=self.docs_weights, K=K)
