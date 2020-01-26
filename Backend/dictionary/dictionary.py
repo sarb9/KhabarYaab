@@ -41,8 +41,8 @@ class Dictionary(UserDict):
         # del self.docs
 
     def calc_clusters(self):
-        cluster_number = define_best_cluster_number(self.docs, 4)
-        self.centroids = kmeans(self.docs, cluster_number, 4)
+        cluster_number = define_best_cluster_number(self.docs, 10)
+        self.centroids = kmeans(self.docs, cluster_number, 10)
 
     def calc_categories(self):
         self.categories = knn(self.docs_weights)
