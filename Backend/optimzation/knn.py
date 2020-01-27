@@ -9,14 +9,13 @@ def knn(labeled_docs, docs, K):
     :return:
     """
 
-    categories = []
-    for i in range(len(docs)):
+    for document in docs:
         dist_matrix = {}
         already_labeled = False  # to prevent calculating the already labeled docs
         for labeled_doc in labeled_docs:
-            cosine_similarity = calc_similarity(vec1=all_docs_weights[labeled_doc[0]], vec2=all_docs_weights[i].vector)
+            cosine_similarity = calc_similarity(vec1=labeled_doc.terms, vec2=document.terms)
             if cosine_similarity == 1:
-                categories.append(labeled_doc[1])
+                document.category = labeled_doc.category
                 already_labeled = True
                 break
             dist_matrix[labeled_doc] = cosine_similarity  # todo check for validity of tuples as dictionary key
@@ -25,14 +24,9 @@ def knn(labeled_docs, docs, K):
             continue
 
         k_nearest_neighbour = pop_best_k(dist_matrix, K)
-        categories.append(most_frequent(
-            [k_nearest_neighbour[i].label for i in range(len(k_nearest_neighbour))]))  # for knn with k = K
-
-    return categories
+        document.category = most_frequent(
+            [k_nearest_neighbour.category for i in range(len(k_nearest_neighbour))])  # for knn with k = K
 
 
 def most_frequent(lst):
     return max(set(lst), key=lst.count)
-
-
-print()

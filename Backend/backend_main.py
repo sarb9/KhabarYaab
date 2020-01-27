@@ -86,8 +86,6 @@ def highlight_phrases_in_content(content, query_phrases):
                                          " <b style='color:red'>" + " " + phrase + " " + "</b> ",
                                          highlighted_content)
 
-
-
         return highlighted_content, phrases
 
     highlighted_content, phrases = bold_phrases(highlighted_content)
@@ -122,8 +120,23 @@ def highlight_phrases_in_content(content, query_phrases):
     return result
 
 
+print("reading labeled dataset corpus: ")
+corpus = import_utils.load_corpus(loc="data/labeled_dataset.xlsx", flag="xls")
+
+# models must be updated!!!!!
+mdls = news_model.create_models_list_from_news(corpus)
+for model in mdls:
+    import_utils.remove_tags(model)
+ind = nindexer.Indexer()
+ind.feed(mdls, for_labeled_data=True)
+print("creating dictionary...")
+dct2 = ind.create_dictionary()
+print(" end of reading of labeled dataset\n\n")
+labeled_docs_vector = dct2.docs
+del dct2
 print("reading from corpus...")
 corpus = import_utils.load_corpus(flag="xls")
+
 
 print("indexing...")
 mdls = news_model.create_models_list_from_news(corpus)
@@ -134,7 +147,7 @@ for model in mdls:
 ind = nindexer.Indexer()
 ind.feed(mdls)
 print("creating dictionary...")
-dct = ind.create_dictionary()
+dct = ind.create_dictionary(labeled_vectors=labeled_docs_vector)
 qh = QueryHandler(dct)
 flask_app = app.FlaskServer(get_news_headers, get_news_content)
 flask_app.run()

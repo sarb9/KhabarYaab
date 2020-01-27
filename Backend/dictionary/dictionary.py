@@ -44,8 +44,8 @@ class Dictionary(UserDict):
         cluster_number = define_best_cluster_number(self.docs, 4)
         self.centroids = kmeans(self.docs, cluster_number, 4)
 
-    def calc_categories(self, labeled_doc ,K=5):
-        self.categories = knn(labeled_doc=labeled_doc, all_docs_weights=self.docs_weights, K=K)
+    def calc_categories(self, labeled_docs, K=5):
+        knn(labeled_docs=labeled_docs, docs=self.docs, K=K)
 
     def add_doc(self, doc):
         self.docs.append(doc)
