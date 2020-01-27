@@ -27,7 +27,7 @@ class Centroid:
     def calc(self):
         self.weights = {}
         for key, value in self.next.items():
-            self.weights[key] = value/self.n_docs
+            self.weights[key] = value / self.n_docs
 
         self.n_docs = 0
         self.next = {}
@@ -40,7 +40,11 @@ def kmeans(documents, k, iterations):
     centroids = []
 
     for i in range(k):
-        centroids.append(Centroid(random.choice(documents).terms))
+        rand = random.choice(documents).terms
+        while len(rand.keys()) < 100:
+            rand = random.choice(documents).terms
+
+        centroids.append(Centroid(rand))
 
     def find_best_centroid(document):
         max_similarity = 0
@@ -55,22 +59,17 @@ def kmeans(documents, k, iterations):
 
     # main loop of k-means
     for i in range(iterations):
-        print(i, "started")
-
+        print("iteration", i, "started!")
         for document in documents:
             centroid = find_best_centroid(document.terms)
             centroid.add(document.terms)
 
-        print(i, "after first")
-
         for centroid in centroids:
             centroid.calc()
 
-        print(i, "after second")
-
     # assign documents to centroids
     for document in documents:
-        find_best_centroid(document.terms).add_document(document.terms)
+        find_best_centroid(document.terms).add_document(document)
 
     return centroids
 
@@ -80,7 +79,7 @@ def error_function(centroids, docs_no):
 
     for centroid in centroids:
         for document in centroid.documents:
-            error += 1 - centroid.similarity(document)
+            error += 1 - centroid.similarity(document.terms)
 
     if docs_no == 0:
         return error
@@ -91,14 +90,16 @@ def error_function(centroids, docs_no):
 def define_best_cluster_number(documents, iterations):
     k = []
     errors = []
-    for cluster_number in range(9, 13, 2):
+    for cluster_number in range(1, 20, 2):
         print("cluster_number:", cluster_number)
         centroids = kmeans(documents, cluster_number, iterations)
-        errors.append(error_function(centroids, docs_no=len(documents)))
+        error = error_function(centroids, docs_no=len(documents))
+        print("cluster_number:", cluster_number, "error ->", error)
+        errors.append(error)
         k.append(cluster_number)
 
     print("k:     ", k)
-    print("errorrrr:    ", errors)
+    print("error:    ", errors)
 
     fig = plt.figure()
     fig.suptitle('test title', fontsize=20)

@@ -1,6 +1,5 @@
 from collections import UserDict
 from math import log
-from array import array
 from optimzation.kmeans import kmeans, define_best_cluster_number
 from optimzation.knn import knn
 
@@ -12,10 +11,9 @@ SCORING_MODE = 3
 class Dictionary(UserDict):
     def __init__(self):
         super().__init__()
-        # this will be vanished..
         self.docs = []
 
-        self.docs_weights = []
+        # self.docs_weights = []
         self.categories = []
         self.centroids = []
 
@@ -36,13 +34,13 @@ class Dictionary(UserDict):
                                    log(n_docs / self.data[term].df)
 
             doc.set_vector(vector)
-            self.docs_weights.append(vector)
+            # self.docs_weights.append(vector)
             # del doc.terms
         # del self.docs
 
     def calc_clusters(self):
-        cluster_number = define_best_cluster_number(self.docs, 4)
-        self.centroids = kmeans(self.docs, cluster_number, 4)
+        cluster_number = define_best_cluster_number(self.docs, 10)
+        self.centroids = kmeans(self.docs, cluster_number, 10)
 
     def calc_categories(self, labeled_docs, K=5):
         knn(labeled_docs=labeled_docs, docs=self.docs, K=K)

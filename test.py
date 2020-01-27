@@ -1,5 +1,10 @@
 import matplotlib.pyplot as plt
+import heapq
 
-plt.plot([9, 11], [0.27, 0.26], "bo-")
+import re
 
-plt.show()
+str = "cat:milad  "
+category = re.search("cat:", str.strip())
+print(type(category))
+print(str[category.end() :])
+print((category.end()))

@@ -7,7 +7,7 @@ from pytest import fixture
 
 @fixture(scope="class")
 def corpus():
-    corpus = load_corpus(loc="data/news1.xlsx")
+    corpus = load_corpus(loc="data/news.xlsx")
     test_model = NewsModel(*corpus[0])
 
     return (corpus, test_model)

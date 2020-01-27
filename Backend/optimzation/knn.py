@@ -12,20 +12,22 @@ def knn(labeled_docs, docs, K):
     for document in docs:
         dist_matrix = {}
         already_labeled = False  # to prevent calculating the already labeled docs
-        for labeled_doc in labeled_docs:
+        for i, labeled_doc in enumerate(labeled_docs):
             cosine_similarity = calc_similarity(vec1=labeled_doc.terms, vec2=document.terms)
             if cosine_similarity == 1:
                 document.category = labeled_doc.category
                 already_labeled = True
                 break
-            dist_matrix[labeled_doc] = cosine_similarity  # todo check for validity of tuples as dictionary key
+            dist_matrix[i] = cosine_similarity  # todo check for validity of tuples as dictionary key
 
         if already_labeled:  # to prevent calculating the already labeled docs
             continue
 
-        k_nearest_neighbour = pop_best_k(dist_matrix, K)
+        k_n_neighbour = pop_best_k(dist_matrix, K)
         document.category = most_frequent(
-            [k_nearest_neighbour.category for i in range(len(k_nearest_neighbour))])  # for knn with k = K
+            [labeled_docs[k_n_neighbour[i]].category for i in range(len(k_n_neighbour))])  # for knn with k = K
+
+    return 2
 
 
 def most_frequent(lst):

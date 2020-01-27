@@ -1,3 +1,4 @@
+import os
 import re
 
 from utils import import_utils
@@ -120,29 +121,34 @@ def highlight_phrases_in_content(content, query_phrases):
     return result
 
 
-print("reading labeled dataset corpus: ")
-corpus = import_utils.load_corpus(loc="data/labeled_dataset.xlsx", flag="xls")
+labeled_docs_vector = None
+if not os.path.exists('data/dictionary_obj.pkl'):
+    print("reading labeled dataset corpus: ")
+    corpus = import_utils.load_corpus(loc="data/labeled_dataset.xlsx", flag="xls")
 
-# models must be updated!!!!!
-mdls = news_model.create_models_list_from_news(corpus)
-for model in mdls:
-    import_utils.remove_tags(model)
-ind = nindexer.Indexer()
-ind.feed(mdls, for_labeled_data=True)
-print("creating dictionary...")
-dct2 = ind.create_dictionary()
-print(" end of reading of labeled dataset\n\n")
-labeled_docs_vector = dct2.docs
-del dct2
+    # models must be updated!!!!!
+    mdls = news_model.create_models_list_from_news(corpus, labeled_data=True)
+    for model in mdls:
+        import_utils.remove_tags(model)
+    ind = nindexer.Indexer()
+    ind.feed(mdls, for_labeled_data=True)
+    print("creating dictionary...")
+    dct2 = ind.create_dictionary()
+    print("end of reading of labeled dataset\n\n")
+    labeled_docs_vector = dct2.docs
+    del dct2
+
 print("reading from corpus...")
-corpus = import_utils.load_corpus(flag="xls")
-
+# corpus = import_utils.load_corpus(flag="xls")
+corpus = import_utils.load_corpus(loc="data/csv/ir-news-0-2.csv", flag="csv")
 
 print("indexing...")
 mdls = news_model.create_models_list_from_news(corpus)
 mdls_with_tags = copy.deepcopy(mdls)
-for model in mdls:
-    import_utils.remove_tags(model)
+
+print("before:", len(mdls))
+mdls = [model for model in mdls if import_utils.remove_tags(model) is not None]
+print("after:", len(mdls))
 
 ind = nindexer.Indexer()
 ind.feed(mdls)
