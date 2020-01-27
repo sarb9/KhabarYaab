@@ -105,7 +105,7 @@ def define_best_cluster_number(documents, iterations):
     fig.suptitle('test title', fontsize=20)
     plt.xlabel('xlabel', fontsize=18)
     plt.ylabel('ylabel', fontsize=16)
-    plt.plot(k, errors, "bo")
+    plt.plot(k, errors, "bo-")
     plt.show()
 
     cluster_number = int(input("it seems thr best number of clusters is: "))

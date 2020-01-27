@@ -99,8 +99,8 @@ class Indexer:
         if labeled_vectors is None:
             return self.dct
 
-        # print("clustering ...")
-        # self.dct.calc_clusters()
+        print("clustering ...")
+        self.dct.calc_clusters()
 
         print("classification ...")
         self.dct.calc_categories(labeled_docs=labeled_vectors)

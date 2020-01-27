@@ -2,6 +2,7 @@ from collections import UserDict
 from math import log
 from optimzation.kmeans import kmeans, define_best_cluster_number
 from optimzation.knn import knn
+from random import sample
 
 # from backend_main import SCORING_MODE
 
@@ -39,13 +40,16 @@ class Dictionary(UserDict):
         # del self.docs
 
     def calc_clusters(self):
-        cluster_number = define_best_cluster_number(self.docs, 10)
-        self.centroids = kmeans(self.docs, cluster_number, 10)
+
+        sampled_docs = sample(self.docs, k=min(len(self.docs), 800))
+        cluster_number = define_best_cluster_number(sampled_docs, iterations=10)
+        self.centroids = kmeans(self.docs, cluster_number, iterations=10)
 
     def calc_categories(self, labeled_docs, K=5):
         knn(labeled_docs=labeled_docs, docs=self.docs, K=K)
 
     def add_doc(self, doc):
+        doc.set_id(len(self.docs))
         self.docs.append(doc)
 
     def __missing__(self, key):

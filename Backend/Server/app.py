@@ -13,7 +13,9 @@ class FlaskServer:
     search_method = None
     get_content_method = None
 
-    def __init__(self, search_method, get_content_method):
+    # get_similars = None
+
+    def __init__(self, search_method, get_content_method, get_similars):
         global app
         EBUG = True
         app = Flask(__name__)
@@ -21,6 +23,7 @@ class FlaskServer:
         app.config['JSON_AS_ASCII'] = False
         self.search_method = search_method
         self.get_content_method = get_content_method
+        self.get_similars = get_similars
 
         @app.route("/")
         def main():
@@ -31,6 +34,7 @@ class FlaskServer:
             # todo: search query method in BTree must be called here and results !
             if request.args.get("q"):
                 results = search_method(request.args.get("q"))
+                # print("$$$$$$$$$$$   RRREEEEESSSSS      $$$$$$$$$  ", len(results), "\n", results)
                 return jsonify({"news_headers": results})
 
         @app.route("/news/<int:news_id>", methods=['GET'])
@@ -38,6 +42,11 @@ class FlaskServer:
             # results = output_news_content
             results = get_content_method(news_id)
             return jsonify(results)
+
+        @app.route("/similar/<int:news_id>", methods=['GET'])
+        def similars(news_id):
+            res = get_similars(news_id)
+            return jsonify(res)
 
     def run(self):
         global app

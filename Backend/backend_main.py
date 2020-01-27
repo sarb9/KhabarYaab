@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 
@@ -9,6 +10,7 @@ from Server import app
 # from indexer.nindexer import check_case_folding
 from ling_modules.stemmer import add_similars
 import copy
+from optimzation.similarity import pop_best_k
 
 SCORING_MODE = 1
 
@@ -24,7 +26,7 @@ def get_news_content(id):
 
 def get_news_headers(query):
     print("your query: ", query)
-    query_phrases = qh.extract_query_parts(query, without_pipeline=True)
+    query_phrases, _ = qh.extract_query_parts(query, without_pipeline=True)
     ans = qh.ask(query)
     results = []
     for doc_id in ans:
@@ -36,6 +38,30 @@ def get_news_headers(query):
              "title": news_model_view.title, "publish_date": news_model_view.publish_date})
 
     return results
+
+
+def get_similars(news_id):
+    answers = qh.ask(None, doc=dct.docs[news_id], k=15)
+    scores = {}
+    for ans in answers:
+        scores[ans] = date_subtractor(mdls[ans].publish_date, mdls[ans].publish_date)
+    answers = pop_best_k(scores, 4)
+    result = []
+    for ans in answers:
+        result.append({"title": mdls[ans].title, "url": "/news/" + ans})
+
+    return {"similar_news": result}
+
+
+def date_subtractor(date1, date2):
+    def __datetime(date_str):
+        return datetime.strptime(date_str, '%B %dth %Y, %H:%M:%S.000')
+
+    start = __datetime(date1)
+    end = __datetime(date2)
+
+    delta = end - start
+    return -1 * abs(delta.total_seconds() / (24 * 3600))
 
 
 def highlight_phrases_in_content(content, query_phrases):
@@ -155,5 +181,5 @@ ind.feed(mdls)
 print("creating dictionary...")
 dct = ind.create_dictionary(labeled_vectors=labeled_docs_vector)
 qh = QueryHandler(dct)
-flask_app = app.FlaskServer(get_news_headers, get_news_content)
+flask_app = app.FlaskServer(get_news_headers, get_news_content, get_similars)
 flask_app.run()
