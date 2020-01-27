@@ -20,5 +20,7 @@ persianstemmer = {file = "https://github.com/htaghizadeh/PersianStemmer-Python/a
 matplotlib = "*"
 pandas = "*"
 
+requests = "*"
+
 [requires]
 python_version = "3.7"
