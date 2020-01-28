@@ -10,7 +10,8 @@ export default class News extends Component {
     thumbnail: [],
     publish_date: [],
     content: [],
-    url: []
+    url: [],
+    similar: []
   };
   componentDidMount() {
     const id = this.props.match.params.id;
@@ -34,9 +35,12 @@ export default class News extends Component {
           content,
           url
         });
-        console.log(this.state);
       })
       .catch(err => console.log(err));
+    Axios.get("http://localhost:5000/similar/" + id).then(res => {
+      this.setState({ similar: res.data.similar_news });
+      console.log(res.data);
+    });
   }
   render() {
     return this.state.content.length === 0 ? (
@@ -66,6 +70,18 @@ export default class News extends Component {
             لینک به خبر اصلی
           </a>
         </div>
+        <br />
+        <br />
+        <div className="similar">
+          <h2>اخبار مشابه :</h2>
+          {this.state.similar.map(sim => (
+            <div>
+              <a href={"http://localhost:3000/" + sim.url}>{sim.title}</a>
+            </div>
+          ))}
+        </div>
+        <br />
+        <br />
       </div>
     );
   }
