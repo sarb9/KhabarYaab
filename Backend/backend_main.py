@@ -19,8 +19,7 @@ def get_news_content(id):
     news_model_view = mdls[id]
     result = {"thumbnail": str(news_model_view.thumbnail), "title": news_model_view.title,
               "content": mdls_with_tags[id].content, "publish_date": str(news_model_view.publish_date),
-              "summary": news_model_view.summary, "url": news_model_view.url, "meta_tags": news_model_view.meta_tags,
-              "news_date": get_date(news_model_view.publish_date)}
+              "summary": news_model_view.summary, "url": news_model_view.url, "meta_tags": news_model_view.meta_tags}
 
     return result
 
@@ -36,7 +35,8 @@ def get_news_headers(query):
             news_model_view.content, query_phrases)
         results.append(
             {"selected_parts": selected_part, "id": news_model_view.id, "thumbnail": str(news_model_view.thumbnail),
-             "title": news_model_view.title, "publish_date": news_model_view.publish_date})
+             "title": news_model_view.title, "publish_date": news_model_view.publish_date,
+             "news_date": get_date(news_model_view.publish_date)})
     return results
 
 
@@ -67,7 +67,7 @@ def highlight_phrases_in_content(content, query_phrases):
 
     def get_upper_bound(index):
         upper_index = 0
-        if index + threshold > len(highlighted_content):
+        if index + threshold > len(highlighted_content) - 1:
             return len(highlighted_content)
         else:
             for i in range(index + threshold, 0, -1):
@@ -153,7 +153,7 @@ if not os.path.exists('data/dictionary_obj.pkl'):
     labeled_docs_vector = dct2.docs
     del dct2
 
-NUMBER_OF_FILES = 1
+NUMBER_OF_FILES = 3
 dataset_base_loc = "data/csv/ir-news-"
 
 print("reading from corpus...")
