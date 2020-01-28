@@ -1,3 +1,4 @@
+import pickle
 from collections import UserDict
 from math import log
 from optimzation.kmeans import kmeans, define_best_cluster_number
@@ -14,8 +15,9 @@ class Dictionary(UserDict):
         super().__init__()
         self.docs = []
 
-        # self.docs_weights = []
         self.categories = []
+        self.models = []
+
         self.centroids = []
 
     def calc_doc_tf_idf(self):
@@ -51,6 +53,10 @@ class Dictionary(UserDict):
     def add_doc(self, doc):
         doc.set_id(len(self.docs))
         self.docs.append(doc)
+
+    def save_dictionary(self):
+        with open('data/dictionary_obj.pkl', 'wb') as output:
+            pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
     def __missing__(self, key):
         if isinstance(key, str):

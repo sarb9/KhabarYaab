@@ -57,10 +57,6 @@ class Indexer:
 
     def create_dictionary(self, force=False, labeled_vectors=None, for_crawler=False):
 
-        def save_dictionary(dct):
-            with open('data/dictionary_obj.pkl', 'wb') as output:
-                pickle.dump(dct, output, pickle.HIGHEST_PROTOCOL)
-
         def load_dictionary():
             with open('data/dictionary_obj.pkl', 'rb') as input_file:
                 return pickle.load(input_file)
@@ -120,7 +116,4 @@ class Indexer:
             if stop_word in self.dct:
                 del self.dct[stop_word]
 
-        # save and return at the end
-        if save_dictionary:
-            save_dictionary(self.dct)
         return self.dct
