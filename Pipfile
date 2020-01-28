@@ -18,6 +18,8 @@ autopep8 = "*"
 pylint = "*"
 persianstemmer = {file = "https://github.com/htaghizadeh/PersianStemmer-Python/archive/master.zip"}
 matplotlib = "*"
+pandas = "*"
+
 requests = "*"
 
 [requires]

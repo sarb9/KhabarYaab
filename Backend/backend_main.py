@@ -1,3 +1,5 @@
+import datetime
+import os
 import re
 
 from utils import import_utils
@@ -8,6 +10,7 @@ from Server import app
 # from indexer.nindexer import check_case_folding
 from ling_modules.stemmer import add_similars
 import copy
+from optimzation.similarity import pop_best_k
 
 SCORING_MODE = 1
 
@@ -23,7 +26,7 @@ def get_news_content(id):
 
 def get_news_headers(query):
     print("your query: ", query)
-    query_phrases = qh.extract_query_parts(query, without_pipeline=True)
+    query_phrases, _ = qh.extract_query_parts(query, without_pipeline=True)
     ans = qh.ask(query)
     results = []
     for doc_id in ans:
@@ -35,6 +38,30 @@ def get_news_headers(query):
              "title": news_model_view.title, "publish_date": news_model_view.publish_date})
 
     return results
+
+
+def get_similars(news_id):
+    answers = qh.ask(None, doc=dct.docs[news_id], k=15)
+    scores = {}
+    for ans in answers:
+        scores[ans] = date_subtractor(mdls[ans].publish_date, mdls[ans].publish_date)
+    answers = pop_best_k(scores, 4)
+    result = []
+    for ans in answers:
+        result.append({"title": mdls[ans].title, "url": "/news/" + ans})
+
+    return {"similar_news": result}
+
+
+def date_subtractor(date1, date2):
+    def __datetime(date_str):
+        return datetime.strptime(date_str, '%B %dth %Y, %H:%M:%S.000')
+
+    start = __datetime(date1)
+    end = __datetime(date2)
+
+    delta = end - start
+    return -1 * abs(delta.total_seconds() / (24 * 3600))
 
 
 def highlight_phrases_in_content(content, query_phrases):
@@ -86,8 +113,6 @@ def highlight_phrases_in_content(content, query_phrases):
                                          " <b style='color:red'>" + " " + phrase + " " + "</b> ",
                                          highlighted_content)
 
-
-
         return highlighted_content, phrases
 
     highlighted_content, phrases = bold_phrases(highlighted_content)
@@ -122,19 +147,39 @@ def highlight_phrases_in_content(content, query_phrases):
     return result
 
 
+labeled_docs_vector = None
+if not os.path.exists('data/dictionary_obj.pkl'):
+    print("reading labeled dataset corpus: ")
+    corpus = import_utils.load_corpus(loc="data/labeled_dataset.xlsx", flag="xls")
+
+    # models must be updated!!!!!
+    mdls = news_model.create_models_list_from_news(corpus, labeled_data=True)
+    for model in mdls:
+        import_utils.remove_tags(model)
+    ind = nindexer.Indexer()
+    ind.feed(mdls, for_labeled_data=True)
+    print("creating dictionary...")
+    dct2 = ind.create_dictionary()
+    print("end of reading of labeled dataset\n\n")
+    labeled_docs_vector = dct2.docs
+    del dct2
+
 print("reading from corpus...")
-corpus = import_utils.load_corpus(flag="xls")
+# corpus = import_utils.load_corpus(flag="xls")
+corpus = import_utils.load_corpus(loc="data/csv/ir-news-0-2.csv", flag="csv")
 
 print("indexing...")
 mdls = news_model.create_models_list_from_news(corpus)
 mdls_with_tags = copy.deepcopy(mdls)
-for model in mdls:
-    import_utils.remove_tags(model)
+
+print("before:", len(mdls))
+mdls = [model for model in mdls if import_utils.remove_tags(model) is not None]
+print("after:", len(mdls))
 
 ind = nindexer.Indexer()
 ind.feed(mdls)
 print("creating dictionary...")
-dct = ind.create_dictionary()
+dct = ind.create_dictionary(labeled_vectors=labeled_docs_vector)
 qh = QueryHandler(dct)
-flask_app = app.FlaskServer(get_news_headers, get_news_content)
+flask_app = app.FlaskServer(get_news_headers, get_news_content, get_similars)
 flask_app.run()

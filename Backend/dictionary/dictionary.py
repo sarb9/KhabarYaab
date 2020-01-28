@@ -1,8 +1,8 @@
 from collections import UserDict
 from math import log
-from array import array
 from optimzation.kmeans import kmeans, define_best_cluster_number
 from optimzation.knn import knn
+from random import sample
 
 # from backend_main import SCORING_MODE
 
@@ -12,15 +12,11 @@ SCORING_MODE = 3
 class Dictionary(UserDict):
     def __init__(self):
         super().__init__()
-        # this will be vanished..
         self.docs = []
 
-        self.docs_weights = []
+        # self.docs_weights = []
         self.categories = []
-        self.clusters_centers = []
-        self.clusters_values = []
-
-    # docs = []
+        self.centroids = []
 
     def calc_doc_tf_idf(self):
         n_docs = len(self.docs)
@@ -39,18 +35,21 @@ class Dictionary(UserDict):
                                    log(n_docs / self.data[term].df)
 
             doc.set_vector(vector)
-            self.docs_weights.append(vector)
-            del doc.terms
-        del self.docs
+            # self.docs_weights.append(vector)
+            # del doc.terms
+        # del self.docs
 
     def calc_clusters(self):
-        cluster_number = define_best_cluster_number(self.docs_weights)
-        self.clusters_centers, self.clusters_values = kmeans(self.docs_weights, k=cluster_number)
 
-    def calc_categories(self):
-        self.categories = knn(self.docs_weights)
+        sampled_docs = sample(self.docs, k=min(len(self.docs), 800))
+        cluster_number = define_best_cluster_number(sampled_docs, iterations=10)
+        self.centroids = kmeans(self.docs, cluster_number, iterations=10)
+
+    def calc_categories(self, labeled_docs, K=5):
+        knn(labeled_docs=labeled_docs, docs=self.docs, K=K)
 
     def add_doc(self, doc):
+        doc.set_id(len(self.docs))
         self.docs.append(doc)
 
     def __missing__(self, key):

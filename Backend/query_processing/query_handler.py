@@ -21,20 +21,61 @@ class QueryHandler:
         self.pipline = pipline.Pipeline(
             normalizer.Normalizer(), stemmer.Stemmer())
 
-    def ask(self, query):
-        query_phrases = self.extract_query_parts(query)
+    def ask(self, query, with_clustering=True, doc=None, k=30):
+        # category,  = None
+        if query is not None:
+            query_phrases, category = self.extract_query_parts(query)
+        if with_clustering:
+            nots = {}
+            more_than_one = False
+            necessary_docs_id = {}
+            if doc is None:
+                nots = {term for qp in query_phrases for term in qp.terms if not qp.b}
+                necessary_docs_id = set(i for i in range(len(self.dct.docs)))
 
-        ans = set(i for i in range(news_model.NewsModel.gid))
-        for qp in query_phrases:
-            docs = self.retrive(qp)
-            if qp.b:
-                ans = ans & docs
+                for qp in query_phrases:
+                    if qp.b and len(qp.terms) > 1:
+                        more_than_one = True
+                        necessary_docs_id = necessary_docs_id & self.retrive(qp)
+                query_vector = self.weight_query(query_phrases)
+
             else:
-                ans = ans - docs
+                query_vector = doc.terms
+                category = doc.category
 
-        ans = self.sort_answers(ans, query_phrases)
+            best_similarity = 0
+            best_centroid = None
+            for centroid in self.dct.centroids:
+                sim = calc_similarity(query_vector, centroid.weights)
+                if sim > best_similarity:
+                    best_similarity = sim
+                    best_centroid = centroid
+            scores = {}
+            for document in best_centroid.documents:
+                if document == doc:
+                    continue
+                common_terms = set(document.terms) & set(query_vector)
+                if len(common_terms) >= min(len(query_vector), 2) and (
+                        set(document.terms) & nots == set()) and (
+                        not more_than_one or document.id in necessary_docs_id):
+                    if category is None or document.category == category:
+                        scores[document.id] = calc_similarity(query_vector, document.terms)
 
-        return ans
+            print("mioooooo", pop_best_k(scores, k))
+            return pop_best_k(scores, k)
+        else:
+            ans = set(i for i in range(len(self.dct.docs)))
+
+            for qp in query_phrases:
+                docs = self.retrive(qp)
+                if qp.b:
+                    ans = ans & docs
+                else:
+                    ans = ans - docs
+
+            ans = self.sort_answers(ans, query_phrases)
+
+            return ans
 
     def weight_query(self, query_phrases):
         query_vector = {}
@@ -49,13 +90,14 @@ class QueryHandler:
         max_tf = max(query_vector.values())
         for term, term_freq in query_vector.items():
             if SCORING_MODE == 1:
-                query_vector[term] = (0.5 + 0.5 * term_freq / max_tf) * log(len(self.dct.docs_weights) / self.dct[term].df)
+                query_vector[term] = (0.5 + 0.5 * term_freq / max_tf) * log(
+                    len(self.dct.docs) / self.dct[term].df)
 
             elif SCORING_MODE == 2:
-                query_vector[term] = log(1 + len(self.dct.docs_weights) / self.dct[term].df)
+                query_vector[term] = log(1 + len(self.dct.docs) / self.dct[term].df)
             elif SCORING_MODE == 3:
-                print("000000000000", len(self.dct.docs_weights), len(self.dct.docs_weights) / self.dct[term].df)
-                query_vector[term] = (1 + log(term_freq)) * log(len(self.dct.docs_weights) / self.dct[term].df)
+                print("000000000000", len(self.dct.docs), len(self.dct.docs) / self.dct[term].df)
+                query_vector[term] = (1 + log(term_freq)) * log(len(self.dct.docs) / self.dct[term].df)
         return query_vector
 
     def sort_answers(self, ans, query_phrases):
@@ -63,7 +105,7 @@ class QueryHandler:
 
         similarities = {}
         for doc_id in ans:
-            doc_vector = self.dct.docs_weights[doc_id]
+            doc_vector = self.dct.docs[doc_id].terms
             similarities[doc_id] = calc_similarity(doc_vector, query_vector)
 
         return pop_best_k(similarities, 30)
@@ -114,7 +156,12 @@ class QueryHandler:
 
     def extract_query_parts(self, query, without_pipeline=False):
         # Todo : query and pipeline
+        category = None
         query = query.strip()
+        for term in re.split(' +', query):
+            match = re.search("cat:", term)
+            if match is not None:
+                category = term[match.end():].strip()
 
         parts = re.findall(r'!?\".*?\"', query)
 
@@ -131,4 +178,4 @@ class QueryHandler:
             parts[:] = [QueryPhrase(part.b, [self.pipline.feed([term])[0]
                                              for term in part.terms]) for part in parts]
 
-        return parts
+        return parts, category

@@ -27,7 +27,7 @@ class Indexer:
         self.pipline = pipline.Pipeline(
             normalizer.Normalizer(), tokenizer.Tokenizer(), stemmer.Stemmer())
 
-    def feed(self, models, force=False):
+    def feed(self, models, force=False, for_labeled_data=False):
 
         if not force and os.path.exists('data/dictionary_obj.pkl'):
             return
@@ -43,6 +43,8 @@ class Indexer:
             heaps_law.append(len(seen_words))
 
             doc = Document(tokens)
+            if for_labeled_data:
+                doc.category = model.category
             self.dct.add_doc(doc)
 
             for i, term in enumerate(tokens):
@@ -53,7 +55,7 @@ class Indexer:
         plt.plot(range(len(models)), heaps_law)
         fig.savefig('statistics/heaps.png', dpi=fig.dpi)
 
-    def create_dictionary(self, force=False):
+    def create_dictionary(self, force=False, labeled_vectors=None):
 
         def save_dictionary(dct):
             with open('data/dictionary_obj.pkl', 'wb') as output:
@@ -92,11 +94,16 @@ class Indexer:
         poslist.df = poslist.df
         self.dct[prev] = poslist
 
-        # calculate tf-idf
+        # calculate tf-idf then cluster and categorize documents
         self.dct.calc_doc_tf_idf()
+        if labeled_vectors is None:
+            return self.dct
+
         print("clustering ...")
         self.dct.calc_clusters()
-        self.dct.calc_categories()
+
+        print("classification ...")
+        self.dct.calc_categories(labeled_docs=labeled_vectors)
 
         # zipfs law
         word_freqs = {len(posting_list): None
@@ -114,5 +121,6 @@ class Indexer:
                 del self.dct[stop_word]
 
         # save and return at the end
-        save_dictionary(self.dct)
+        if save_dictionary:
+            save_dictionary(self.dct)
         return self.dct
