@@ -1,4 +1,4 @@
-from datetime import datetime
+from utils.date_utils import get_date, date_subtractor
 import os
 import re
 
@@ -19,7 +19,8 @@ def get_news_content(id):
     news_model_view = mdls[id]
     result = {"thumbnail": str(news_model_view.thumbnail), "title": news_model_view.title,
               "content": mdls_with_tags[id].content, "publish_date": str(news_model_view.publish_date),
-              "summary": news_model_view.summary, "url": news_model_view.url, "meta_tags": news_model_view.meta_tags}
+              "summary": news_model_view.summary, "url": news_model_view.url, "meta_tags": news_model_view.meta_tags,
+              "news_date": get_date(news_model_view.publish_date)}
 
     return result
 
@@ -50,17 +51,6 @@ def get_similars(news_id):
         result.append({"title": mdls[ans].title, "url": "/results/" + str(ans)})
 
     return {"similar_news": result}
-
-
-def date_subtractor(date1, date2):
-    def __datetime(date_str):
-        return datetime.strptime(date_str, '%B %dth %Y, %H:%M:%S.000')
-
-    start = __datetime(date1)
-    end = __datetime(date2)
-
-    delta = end - start
-    return -1 * abs(delta.total_seconds() / (24 * 3600))
 
 
 def highlight_phrases_in_content(content, query_phrases):

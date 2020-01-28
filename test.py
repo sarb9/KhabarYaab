@@ -15,12 +15,14 @@ def __datetime(date_str):
 start = __datetime(start_date)
 end = __datetime(end_date)
 
-delta = end - start
-print(delta)  # prints: 1 day, 7:50:05
-print(abs(delta.total_seconds() / (24 * 3600)))  # prints: 114605.0
+print(end)
 
-
-# print("/news/"+ str3)
-
-
-print(type([11]) is list)
+# delta = end - start
+# print(delta)  # prints: 1 day, 7:50:05
+# print(abs(delta.total_seconds() / (24 * 3600)))  # prints: 114605.0
+#
+#
+# # print("/news/"+ str3)
+#
+#
+# print(type([11]) is list)
