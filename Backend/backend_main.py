@@ -2,6 +2,7 @@ from utils.date_utils import get_date, date_subtractor
 import os
 import re
 
+from optimzation.knn import categorize
 from utils import import_utils
 from models import news_model
 from indexer import nindexer
@@ -136,6 +137,40 @@ def highlight_phrases_in_content(content, query_phrases):
     return result
 
 
+def create_models_without_tags(models):
+    mdls_with_tags = copy.deepcopy(models)
+    print("before:", len(models))
+    # mdls = [model for model in mdls if import_utils.remove_tags(model) is not None
+    temp_mdls = []
+    removed_indices = []
+    for i, model in enumerate(models):
+        r_mdl = import_utils.remove_tags(model)
+        if r_mdl is not None:
+            temp_mdls.append(r_mdl)
+        else:
+            removed_indices.append(i)
+
+    # mdls = temp_mdls
+    mdls_with_tags = [model for i, model in enumerate(mdls_with_tags) if i not in removed_indices]
+    return temp_mdls, mdls_with_tags
+
+
+def index_crawler_models(crawler_models, original_dct, original_models_with_tags, original_models):
+    crawler_models, models_with_tags = create_models_without_tags(crawler_models)
+    ind = nindexer.Indexer()
+    ind.feed(crawler_models)
+    crawler_dct = ind.create_dictionary(for_crawler=True)
+    for model in crawler_models:
+        original_models.append(model)
+    for model in models_with_tags:
+        original_models_with_tags.append(model)
+
+    for doc in crawler_dct.docs:
+        original_dct.add_doc(doc)
+        doc.category = categorize(doc)
+    # save_new_dictionary()
+
+
 labeled_docs_vector = None
 if not os.path.exists('data/dictionary_obj.pkl'):
     print("reading labeled dataset corpus: ")
@@ -168,10 +203,23 @@ for i in range(NUMBER_OF_FILES):
     for model in news_model.create_models_list_from_news(corpus):
         mdls.append(model)
 
-mdls_with_tags = copy.deepcopy(mdls)
+# mdls_with_tags = copy.deepcopy(mdls)
+#
+# print("before:", len(mdls))
+# # mdls = [model for model in mdls if import_utils.remove_tags(model) is not None
+# temp_mdls = []
+# removed_indices = []
+# for i, model in enumerate(mdls):
+#     r_mdl = import_utils.remove_tags(model)
+#     if r_mdl is not None:
+#         temp_mdls.append(r_mdl)
+#     else:
+#         removed_indices.append(i)
+#
+# mdls = temp_mdls
+# mdls_with_tags = [model for i, model in enumerate(mdls_with_tags) if i not in removed_indices]
 
-print("before:", len(mdls))
-mdls = [model for model in mdls if import_utils.remove_tags(model) is not None]
+mdls, mdls_with_tags = create_models_without_tags(mdls)
 print("after:", len(mdls))
 
 ind = nindexer.Indexer()

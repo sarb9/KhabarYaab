@@ -55,7 +55,7 @@ class Indexer:
         plt.plot(range(len(models)), heaps_law)
         fig.savefig('statistics/heaps.png', dpi=fig.dpi)
 
-    def create_dictionary(self, force=False, labeled_vectors=None):
+    def create_dictionary(self, force=False, labeled_vectors=None, for_crawler=False):
 
         def save_dictionary(dct):
             with open('data/dictionary_obj.pkl', 'wb') as output:
@@ -96,7 +96,7 @@ class Indexer:
 
         # calculate tf-idf then cluster and categorize documents
         self.dct.calc_doc_tf_idf()
-        if labeled_vectors is None:
+        if labeled_vectors is None or for_crawler:
             return self.dct
 
         print("clustering ...")

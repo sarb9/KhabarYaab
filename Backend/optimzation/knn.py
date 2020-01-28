@@ -1,5 +1,7 @@
 from optimzation.similarity import calc_similarity, pop_best_k
 
+labeled_data = None
+
 
 def knn(labeled_docs, docs, K):
     """
@@ -8,26 +10,24 @@ def knn(labeled_docs, docs, K):
     :param all_docs_weights: whole dataset containing labeled ones, list of vectors
     :return:
     """
-
+    global labeled_data
+    labeled_data = labeled_docs
     for document in docs:
-        dist_matrix = {}
-        already_labeled = False  # to prevent calculating the already labeled docs
-        for i, labeled_doc in enumerate(labeled_docs):
-            cosine_similarity = calc_similarity(vec1=labeled_doc.terms, vec2=document.terms)
-            if cosine_similarity == 1:
-                document.category = labeled_doc.category
-                already_labeled = True
-                break
-            dist_matrix[i] = cosine_similarity  # todo check for validity of tuples as dictionary key
+        categorize(document, labeled_docs=labeled_docs, k=K)
 
-        if already_labeled:  # to prevent calculating the already labeled docs
-            continue
 
-        k_n_neighbour = pop_best_k(dist_matrix, K)
-        document.category = most_frequent(
-            [labeled_docs[k_n_neighbour[i]].category for i in range(len(k_n_neighbour))])  # for knn with k = K
+def categorize(doc, k=5):
+    dist_matrix = {}
+    for i, labeled_doc in enumerate(labeled_docs):
+        cosine_similarity = calc_similarity(vec1=labeled_doc.terms, vec2=doc.terms)
+        if cosine_similarity == 1:
+            doc.category = labeled_doc.category
+            return
+        dist_matrix[i] = cosine_similarity  # todo check for validity of tuples as dictionary key
 
-    return 2
+    k_n_neighbour = pop_best_k(dist_matrix, K)
+    doc.category = most_frequent(
+        [labeled_docs[k_n_neighbour[i]].category for i in range(len(k_n_neighbour))])  # for knn with k = K
 
 
 def most_frequent(lst):
