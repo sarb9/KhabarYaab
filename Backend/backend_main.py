@@ -27,7 +27,7 @@ def get_news_content(id):
 def get_news_headers(query):
     print("your query: ", query)
     query_phrases, _ = qh.extract_query_parts(query, without_pipeline=True)
-    ans = qh.ask(query)
+    ans = qh.ask(query, b=min(len(dct.centroids), 5))
     results = []
     for doc_id in ans:
         news_model_view = mdls[doc_id]
@@ -40,7 +40,7 @@ def get_news_headers(query):
 
 
 def get_similars(news_id):
-    answers = qh.ask(None, doc=dct.docs[news_id], k=15)
+    answers = qh.ask(None, doc=dct.docs[news_id], k=15, b=min(len(dct.centroids) - 2, 1))
     scores = {}
     for ans in answers:
         scores[ans] = date_subtractor(mdls[ans].publish_date, mdls[ans].publish_date)
@@ -163,24 +163,32 @@ if not os.path.exists('data/dictionary_obj.pkl'):
     labeled_docs_vector = dct2.docs
     del dct2
 
-print("reading from corpus...")
-# corpus = import_utils.load_corpus(flag="xls")
-corpus = import_utils.load_corpus(loc="data/csv/ir-news-0-2.csv", flag="csv")
+NUMBER_OF_FILES = 5
+dataset_base_loc = "data/csv/ir-news-"
 
-print("indexing...")
-mdls = news_model.create_models_list_from_news(corpus)
+print("reading from corpus...")
+mdls = []
+for i in range(NUMBER_OF_FILES):
+    # corpus = import_utils.load_corpus(flag="xls")
+    print("reading " + "file " + str(i + 1) + " ...")
+    loc = dataset_base_loc + str(2 * i) + "-" + str(2 * (i + 1)) + ".csv"
+    corpus = import_utils.load_corpus(loc=loc, flag="csv")
+
+    print("indexing...")
+    mdls.append(news_model.create_models_list_from_news(corpus))
+
 mdls_with_tags = copy.deepcopy(mdls)
 
 print("before:", len(mdls))
-mdls = [model for model in mdls if import_utils.remove_tags(model) is not None]
+mdls = [model for model_list in mdls for model in model_list if import_utils.remove_tags(model) is not None]
 print("after:", len(mdls))
 
 ind = nindexer.Indexer()
+print("feeding ...")
 ind.feed(mdls)
 print("creating dictionary...")
 dct = ind.create_dictionary(labeled_vectors=labeled_docs_vector)
 qh = QueryHandler(dct)
 flask_app = app.FlaskServer(get_news_headers, get_news_content, get_similars)
-
 
 flask_app.run()

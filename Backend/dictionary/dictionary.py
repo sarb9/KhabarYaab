@@ -40,10 +40,10 @@ class Dictionary(UserDict):
         # del self.docs
 
     def calc_clusters(self):
-
-        sampled_docs = sample(self.docs, k=min(len(self.docs), 800))
-        cluster_number = define_best_cluster_number(sampled_docs, iterations=10)
-        self.centroids = kmeans(self.docs, cluster_number, iterations=10)
+        sampled_docs = sample(self.docs, k=min(len(self.docs), 15000))
+        # cluster_number = define_best_cluster_number(sampled_docs, iterations=10)
+        cluster_number = 12
+        self.centroids = kmeans(sampled_docs, cluster_number, iterations=10)
 
     def calc_categories(self, labeled_docs, K=5):
         knn(labeled_docs=labeled_docs, docs=self.docs, K=K)
