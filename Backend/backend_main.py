@@ -34,9 +34,8 @@ def get_news_headers(query):
         selected_part = highlight_phrases_in_content(
             news_model_view.content, query_phrases)
         results.append(
-            {"selected_parts": selected_part, "id": news_model_view.id, "thumbnail": news_model_view.thumbnail,
+            {"selected_parts": selected_part, "id": news_model_view.id, "thumbnail": str(news_model_view.thumbnail),
              "title": news_model_view.title, "publish_date": news_model_view.publish_date})
-
     return results
 
 
@@ -183,7 +182,5 @@ dct = ind.create_dictionary(labeled_vectors=labeled_docs_vector)
 qh = QueryHandler(dct)
 flask_app = app.FlaskServer(get_news_headers, get_news_content, get_similars)
 
-print(get_similars(35))
-print()
 
 flask_app.run()
