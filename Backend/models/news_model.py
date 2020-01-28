@@ -1,5 +1,6 @@
 def create_models_list_from_news(news):
-    return [NewsModel(*args) for args in news]
+    return [NewsModel(args['publish_date'], args['title'], args['url'], args['summary'],
+                      args['meta_tags'], args['content'], args['thumbnail']) for index, args in news.iterrows()]
 
 
 class NewsModel:

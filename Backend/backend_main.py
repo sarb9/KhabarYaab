@@ -123,13 +123,16 @@ def highlight_phrases_in_content(content, query_phrases):
 
 
 print("reading from corpus...")
-corpus = import_utils.load_corpus(flag="xls")
+# corpus = import_utils.load_corpus(flag="xls")
+corpus = import_utils.load_corpus(loc="data/csv/ir-news-0-2.csv", flag="csv")
 
 print("indexing...")
 mdls = news_model.create_models_list_from_news(corpus)
 mdls_with_tags = copy.deepcopy(mdls)
-for model in mdls:
-    import_utils.remove_tags(model)
+
+print("before:", len(mdls))
+mdls = [model for model in mdls if import_utils.remove_tags(model) is not None]
+print("after:", len(mdls))
 
 ind = nindexer.Indexer()
 ind.feed(mdls)

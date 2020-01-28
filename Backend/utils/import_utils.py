@@ -4,12 +4,17 @@ import xlrd
 import csv
 import sys
 
+import pandas as pd
+
 DATA_LOC = "data/news.xlsx"
 # DATA_LOC = "data/news_14.csv"
 
-
 def remove_tags(news_model):
+    if not news_model.content:
+        return None
     news_model.content = BeautifulSoup(news_model.content, 'lxml').text
+    if not news_model.content:
+        return None
     return news_model
 
 
@@ -32,4 +37,14 @@ def load_corpus(loc=DATA_LOC, flag="xls"):
                 del item[7]
                 del item[4]
         return news
+
+    elif flag == "csv":
+        df = pd.read_csv(loc, error_bad_lines=False, engine="python", encoding="utf-8")
+
+        del df['source_url']
+        del df['category']
+        del df['subcategory']
+
+        return df
+
 
