@@ -21,7 +21,7 @@ class QueryHandler:
         self.pipline = pipline.Pipeline(
             normalizer.Normalizer(), stemmer.Stemmer())
 
-    def ask(self, query, with_clustering=True, doc=None, k=30):
+    def ask(self, query, with_clustering=True, doc=None, k=30, b=9):
         # category,  = None
         if query is not None:
             query_phrases, category = self.extract_query_parts(query)
@@ -43,23 +43,29 @@ class QueryHandler:
                 query_vector = doc.terms
                 category = doc.category
 
-            best_similarity = 0
-            best_centroid = None
-            for centroid in self.dct.centroids:
-                sim = calc_similarity(query_vector, centroid.weights)
-                if sim > best_similarity:
-                    best_similarity = sim
-                    best_centroid = centroid
+            best_centroids = []
+            for i in range(b):
+                best_centroid = None
+                best_similarity = -1
+                for centroid in self.dct.centroids:
+                    if centroid in best_centroids:
+                        continue
+                    sim = calc_similarity(query_vector, centroid.weights)
+                    if sim > best_similarity:
+                        best_similarity = sim
+                        best_centroid = centroid
+                best_centroids.append(best_centroid)
             scores = {}
-            for document in best_centroid.documents:
-                if document == doc:
-                    continue
-                common_terms = set(document.terms) & set(query_vector)
-                if len(common_terms) >= min(len(query_vector), 2) and (
-                        set(document.terms) & nots == set()) and (
-                        not more_than_one or document.id in necessary_docs_id):
-                    if category is None or document.category == category:
-                        scores[document.id] = calc_similarity(query_vector, document.terms)
+            for centroid in best_centroids:
+                for document in centroid.documents:
+                    if document == doc:
+                        continue
+                    common_terms = set(document.terms) & set(query_vector)
+                    if len(common_terms) >= min(len(query_vector), 2) and (
+                            set(document.terms) & set(nots) == set()) and (
+                            not more_than_one or document.id in necessary_docs_id):
+                        if category is None or document.category.lower() == category.lower():
+                            scores[document.id] = calc_similarity(query_vector, document.terms)
 
             print("mioooooo", pop_best_k(scores, k))
             return pop_best_k(scores, k)
@@ -74,7 +80,13 @@ class QueryHandler:
                     ans = ans - docs
 
             ans = self.sort_answers(ans, query_phrases)
-
+            if category is not None:
+                categorized_ans = []
+                for answer in ans:
+                    if self.dct.docs[answer].category == category:
+                        categorized_ans.append(answer)
+                return categorized_ans
+            print("miooo ", ans)
             return ans
 
     def weight_query(self, query_phrases):
@@ -161,7 +173,9 @@ class QueryHandler:
         for term in re.split(' +', query):
             match = re.search("cat:", term)
             if match is not None:
-                category = term[match.end():].strip()
+                category = term[match.end():].strip().lower()
+                query = query.replace(term, "")
+                break
 
         parts = re.findall(r'!?\".*?\"', query)
 

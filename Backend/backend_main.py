@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import os
 import re
 
@@ -48,7 +48,7 @@ def get_similars(news_id):
     answers = pop_best_k(scores, 4)
     result = []
     for ans in answers:
-        result.append({"title": mdls[ans].title, "url": "/news/" + ans})
+        result.append({"title": mdls[ans].title, "url": "/results/" + str(ans)})
 
     return {"similar_news": result}
 
@@ -182,4 +182,8 @@ print("creating dictionary...")
 dct = ind.create_dictionary(labeled_vectors=labeled_docs_vector)
 qh = QueryHandler(dct)
 flask_app = app.FlaskServer(get_news_headers, get_news_content, get_similars)
+
+print(get_similars(35))
+print()
+
 flask_app.run()

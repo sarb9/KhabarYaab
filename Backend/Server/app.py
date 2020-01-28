@@ -17,7 +17,7 @@ class FlaskServer:
 
     def __init__(self, search_method, get_content_method, get_similars):
         global app
-        EBUG = True
+        # app.DEBUG = True
         app = Flask(__name__)
         app.config.from_object(__name__)
         app.config['JSON_AS_ASCII'] = False
