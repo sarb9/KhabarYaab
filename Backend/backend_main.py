@@ -17,8 +17,8 @@ SCORING_MODE = 1
 
 def get_news_content(id):
     news_model_view = mdls[id]
-    result = {"thumbnail": news_model_view.thumbnail, "title": news_model_view.title,
-              "content": mdls_with_tags[id].content, "publish_date": news_model_view.publish_date,
+    result = {"thumbnail": str(news_model_view.thumbnail), "title": news_model_view.title,
+              "content": mdls_with_tags[id].content, "publish_date": str(news_model_view.publish_date),
               "summary": news_model_view.summary, "url": news_model_view.url, "meta_tags": news_model_view.meta_tags}
 
     return result
@@ -163,7 +163,7 @@ if not os.path.exists('data/dictionary_obj.pkl'):
     labeled_docs_vector = dct2.docs
     del dct2
 
-NUMBER_OF_FILES = 5
+NUMBER_OF_FILES = 1
 dataset_base_loc = "data/csv/ir-news-"
 
 print("reading from corpus...")
@@ -175,12 +175,13 @@ for i in range(NUMBER_OF_FILES):
     corpus = import_utils.load_corpus(loc=loc, flag="csv")
 
     print("indexing...")
-    mdls.append(news_model.create_models_list_from_news(corpus))
+    for model in news_model.create_models_list_from_news(corpus):
+        mdls.append(model)
 
 mdls_with_tags = copy.deepcopy(mdls)
 
 print("before:", len(mdls))
-mdls = [model for model_list in mdls for model in model_list if import_utils.remove_tags(model) is not None]
+mdls = [model for model in mdls if import_utils.remove_tags(model) is not None]
 print("after:", len(mdls))
 
 ind = nindexer.Indexer()

@@ -12,18 +12,12 @@ DATA_LOC = "data/news.xlsx"
 # DATA_LOC = "data/news_14.csv"
 
 def remove_tags(news_model):
-    if type(news_model) is list:
-        removed_models = []
-        for model in news_model:
-            removed_models.append(remove_tags(model))
-        return removed_models
-    else:
-        if not news_model.content:
-            return None
-        news_model.content = BeautifulSoup(news_model.content, 'lxml').text
-        if not news_model.content:
-            return None
-        return news_model
+    if not news_model.content:
+        return None
+    news_model.content = BeautifulSoup(news_model.content, 'lxml').text
+    if not news_model.content:
+        return None
+    return news_model
 
 
 def load_corpus(loc=DATA_LOC, flag="xls"):
