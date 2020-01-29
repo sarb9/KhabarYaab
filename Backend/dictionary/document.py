@@ -6,7 +6,7 @@ class Document:
 
     def __init__(self, tokens):
         self.terms = {}
-        self.cluster = None
+        self.centroid = None
         self.id = None
         # self.vector= {}
         self.category = None

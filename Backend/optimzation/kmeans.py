@@ -36,13 +36,13 @@ class Centroid:
         self.documents.append(document)
 
 
-def kmeans(documents, k, iterations):
+def kmeans(sampled_documents, all_documents, k, iterations):
     centroids = []
 
     for i in range(k):
-        rand = random.choice(documents).terms
+        rand = random.choice(sampled_documents).terms
         while len(rand.keys()) < 100:
-            rand = random.choice(documents).terms
+            rand = random.choice(sampled_documents).terms
 
         centroids.append(Centroid(rand))
 
@@ -60,7 +60,7 @@ def kmeans(documents, k, iterations):
     # main loop of k-means
     for i in range(iterations):
         print("iteration", i, "started!")
-        for document in documents:
+        for document in sampled_documents:
             centroid = find_best_centroid(document.terms)
             centroid.add(document.terms)
 
@@ -68,7 +68,7 @@ def kmeans(documents, k, iterations):
             centroid.calc()
 
     # assign documents to centroids
-    for document in documents:
+    for document in all_documents:
         find_best_centroid(document.terms).add_document(document)
 
     return centroids
@@ -110,3 +110,4 @@ def define_best_cluster_number(documents, iterations):
 
     cluster_number = int(input("it seems thr best number of clusters is: "))
     return cluster_number
+
