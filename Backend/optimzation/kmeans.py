@@ -108,6 +108,6 @@ def define_best_cluster_number(documents, iterations):
     plt.plot(k, errors, "bo-")
     plt.show()
 
-    cluster_number = int(input("it seems thr best number of clusters is: "))
+    cluster_number = int(input("it seems the best number of clusters is: "))
     return cluster_number
 
