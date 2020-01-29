@@ -8,8 +8,8 @@ from models import news_model
 from indexer import nindexer
 from query_processing.query_handler import QueryHandler
 from Server import app
+from optimzation.kmeans import assign_one_doc_to_centroids
 from ling_modules.stemmer import add_similars
-import copy
 from optimzation.similarity import pop_best_k
 
 SCORING_MODE = 1
@@ -57,7 +57,7 @@ def get_similars(news_id):
 
 def highlight_phrases_in_content(content, query_phrases):
     result = ""
-    highlighted_content = content
+    highlighted_content = import_utils.remove_tag_from_content(content)
 
     def get_lower_bound(index):
         if index - threshold < 0:
@@ -96,7 +96,7 @@ def highlight_phrases_in_content(content, query_phrases):
                         phrases.append(s_term)
 
         for phrase in phrases:
-            highlighted_content = re.sub(r"\s[\u200c]?" + phrase,
+            highlighted_content = re.sub(r"[\s\":*;»«][\u200c]?" + phrase,
                                          " <b style='color:red'>" + " " + phrase + " " + "</b> ",
                                          highlighted_content)
 
@@ -111,7 +111,7 @@ def highlight_phrases_in_content(content, query_phrases):
     list_of_index = []
     for phrase in phrases:
         # index = highlighted_content.find(phrase)
-        index = re.search(r"\s[/u200c]?" + phrase, highlighted_content)
+        index = re.search(r"[\s\":*;»«][\u200c]?" + phrase, highlighted_content)
         if index is not None:
             list_of_index.append(index.start())
         # if index != -1:
@@ -135,9 +135,8 @@ def highlight_phrases_in_content(content, query_phrases):
 
 
 def eliminate_html_tags(models):
-    mdls_with_tags = copy.deepcopy(models)
+    htmls = [model.content for model in models]
     print("before:", len(models))
-    # mdls = [model for model in mdls if import_utils.remove_tags(model) is not None
     temp_mdls = []
     removed_indices = []
     for i, model in enumerate(models):
@@ -147,8 +146,7 @@ def eliminate_html_tags(models):
         else:
             removed_indices.append(i)
 
-    html_contents_mdls = [model.content for i, model in enumerate(mdls_with_tags) if i not in removed_indices]
-    del mdls_with_tags
+    html_contents_mdls = [html for i, html in enumerate(htmls) if i not in removed_indices]
     return temp_mdls, html_contents_mdls
 
 
@@ -165,8 +163,9 @@ def index_crawler_models(crawler_models, original_dct):
         crawled_doc_i = crawler_dct.docs[i]
         original_dct.add_doc(crawled_doc_i)
         crawled_doc_i.category = categorize(crawled_doc_i)
+        assign_one_doc_to_centroids(crawled_doc_i, original_dct.centroids)
 
-    dct.save_dictionary()
+    original_dct.save_dictionary()
 
 
 def renew_models(mdls, html_contents_mdls, min_index=0):

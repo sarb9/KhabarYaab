@@ -21,7 +21,7 @@ class QueryHandler:
         self.pipline = pipline.Pipeline(
             normalizer.Normalizer(), stemmer.Stemmer())
 
-    def ask(self, query, with_clustering=True, doc=None, k=30, b=9):
+    def ask(self, query, with_clustering=False, doc=None, k=30, b=9):
         # category,  = None
         if query is not None:
             query_phrases, category = self.extract_query_parts(query)

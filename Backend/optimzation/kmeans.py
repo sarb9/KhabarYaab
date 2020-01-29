@@ -36,7 +36,19 @@ class Centroid:
         self.documents.append(document)
 
 
-def kmeans(sampled_documents, all_documents, k, iterations):
+def find_best_centroid(document, centroids):
+    max_similarity = 0
+    best_centroid = centroids[0]
+
+    for centroid in centroids:
+        sim = centroid.similarity(document)
+        if sim > max_similarity:
+            max_similarity = sim
+            best_centroid = centroid
+    return best_centroid
+
+
+def kmeans(sampled_documents, k, iterations):
     centroids = []
 
     for i in range(k):
@@ -46,32 +58,26 @@ def kmeans(sampled_documents, all_documents, k, iterations):
 
         centroids.append(Centroid(rand))
 
-    def find_best_centroid(document):
-        max_similarity = 0
-        best_centroid = centroids[0]
-
-        for centroid in centroids:
-            sim = centroid.similarity(document)
-            if sim > max_similarity:
-                max_similarity = sim
-                best_centroid = centroid
-        return best_centroid
-
     # main loop of k-means
     for i in range(iterations):
         print("iteration", i, "started!")
         for document in sampled_documents:
-            centroid = find_best_centroid(document.terms)
+            centroid = find_best_centroid(document.terms, centroids)
             centroid.add(document.terms)
 
         for centroid in centroids:
             centroid.calc()
 
-    # assign documents to centroids
-    for document in all_documents:
-        find_best_centroid(document.terms).add_document(document)
-
     return centroids
+
+
+def assign_docs_to_centroids(docs, centroids):
+    for document in docs:
+        find_best_centroid(document.terms, centroids).add_document(document)
+
+
+def assign_one_doc_to_centroids(doc, centroids):
+    find_best_centroid(doc.terms, centroids).add_document(doc)
 
 
 def error_function(centroids, docs_no):
@@ -110,4 +116,3 @@ def define_best_cluster_number(documents, iterations):
 
     cluster_number = int(input("it seems the best number of clusters is: "))
     return cluster_number
-

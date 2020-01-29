@@ -20,6 +20,10 @@ def remove_tags(news_model):
     return news_model
 
 
+def remove_tag_from_content(content):
+    return BeautifulSoup(content, 'lxml').text
+
+
 def load_corpus(loc=DATA_LOC, flag="xls"):
     if flag == "xls":
         wb = xlrd.open_workbook(loc)
