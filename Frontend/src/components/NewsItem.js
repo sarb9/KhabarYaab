@@ -6,13 +6,13 @@ import Parser from "html-react-parser";
 
 export class NewsItem extends Component {
   render() {
-    console.log(this.props);
     const {
       id,
       title,
       selected_parts,
       thumbnail,
       publish_date,
+      news_date,
       url
     } = this.props.News;
     return (
